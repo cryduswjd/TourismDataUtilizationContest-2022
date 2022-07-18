@@ -2,8 +2,8 @@
 
 const express = require("express");
 const router = express.Router();
-const account_ctrl = require("../controller/account_ctrl");
+const main_ctrl = require("../controller/main_ctrl");
 
-router.get("/", account_ctrl.main);
+router.get('/', main_ctrl.main);
 
 module.exports = router;

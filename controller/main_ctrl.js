@@ -1,8 +1,11 @@
 "use strict"
 
+
 async function main(req, res, next) {
-    res.send("main");
+    // const socketio_ = socketio;
+    // res.render('socket_test');
 }
+
 
 module.exports = {
     main
