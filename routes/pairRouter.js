@@ -2,8 +2,8 @@
 
 const express = require("express");
 const router = express.Router();
-const main_ctrl = require("../controller/main_ctrl");
+const pair_ctrl = require("../controller/pair_ctrl");
 
-router.get('/', main_ctrl.main);
+
 
 module.exports = router;

@@ -58,6 +58,19 @@ function chat_list_key(parameter) {
     });
 }
 
+//동행 참여인원 +
+function plus_personnel(parameter) {
+    return new Promise((resolve, reject) => {
+        console.log("db start p")
+        const queryData = `UPDATE chat_list SET personnel = personnel + 1 where room_key = ?`;
+        db.query(queryData, [parameter], (err, db_data) => {
+            console.log(db_data);
+            if(db_data) resolve(db_data);
+            else reject(err);
+        })
+    });
+}
+
 //동행 채팅방 리스트
 function chat_list_accompanyC(parameter) {
     return new Promise((resolve, reject) => {
@@ -79,7 +92,7 @@ function chat_list_accompanyC(parameter) {
 function chat_listC_host(parameter) {
     return new Promise((resolve, reject) => {
         console.log("db start p")
-        const queryData = `INSERT INTO chat_list(user_key, post_key, title, type) values (?, ?, ?, 1)`;
+        const queryData = `INSERT INTO chat_list(user_key, post_key, title, type, personnel) values (?, ?, ?, 1, 1)`;
         db.query(queryData, [parameter.user_key, parameter.post_key, parameter.title], (err, db_data) => {
             console.log(db_data);
             if(db_data){
@@ -182,6 +195,7 @@ module.exports = {
     chat_read_each,
     chat_listR_socket,
     chat_list_key,
+    plus_personnel,
     chat_list_accompanyC,
     chat_listC_host,
     chat_companion,

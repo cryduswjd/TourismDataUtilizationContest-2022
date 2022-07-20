@@ -19,7 +19,7 @@ router.get('/companionPostR_A', accompany_ctrl.companionPost_read_A);
 
 
 //동행자 디테일
-
+router.get('/companion_detail/:user_key', accompany_ctrl.profile_detail);
 //동행 게시글 검색_아이디o
 router.get('/companionPost_search_user', accompany_ctrl.companionPost_search_user);
 //동행 게시글 검색_지역o

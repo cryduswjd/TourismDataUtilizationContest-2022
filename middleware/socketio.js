@@ -21,6 +21,7 @@ module.exports = (server) => {
 
             if ( msg.type == 1 ) { 
                 const join_db_data = await chatDAO.chatRoom_companion(parameters);
+                const plus_personnel = await chatDAO.plus_personnel(parameters.room_key);
             }
             if ( msg.type == 2 ) { 
                 const join_db_data = await chatDAO.chatRoom_friend(parameters);
@@ -49,7 +50,7 @@ module.exports = (server) => {
         });
     
         socket.on('disconnect', async () => {
-            console.log('user disconnected');
         });
+
     });
 };

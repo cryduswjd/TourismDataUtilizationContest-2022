@@ -6,7 +6,19 @@ function companion_postC(parameter) {
     return new Promise((resolve, reject) => {
         console.log("db start p")
         const queryData = `INSERT INTO accompany(user_key, title, des, personnel, tag) values (?, ?, ?, ?, ?)`;
-        db.query(queryData, [parameter.user_key, parameter.title, parameter.des, parameter.personnel, parameter.tag], (err, db_data) => {
+        db.query(queryData, [parameter.user_key, parameter.title, parameter.des, parameter.personnel, parameter.tags], (err, db_data) => {
+            console.log(db_data);
+            if(db_data) resolve(db_data);
+            else reject(err);
+        })
+    });
+}
+
+function post_tag(parameter) {
+    return new Promise((resolve, reject) => {
+        console.log("db start p")
+        const queryData = `INSERT INTO tag (post_key, tag_name) values (?, ?)`;
+        db.query(queryData, [parameter.post_key, parameter.tagg], (err, db_data) => {
             console.log(db_data);
             if(db_data) resolve(db_data);
             else reject(err);
@@ -84,6 +96,17 @@ function companion_postR_A(parameter) {
     });
 }
 
+function companion_detail(parameter) {
+    return new Promise((resolve, reject) => {
+        const qeuryData = 'SELECT nickname, img FROM user where user_key = ?';
+        db.query(qeuryData, [parameter], (err, db_data) => {
+            console.log(db_data);
+            if(db_data) resolve(db_data);
+            else reject(err);
+        })
+    })
+}
+
 function companion_search_user(parameter) {
     return new Promise((resolve, reject) => {
         console.log("db start p")
@@ -111,12 +134,14 @@ function companion_search_area(parameter) {
 
 module.exports = {  
     companion_postC,
+    post_tag,
     companion_postU,
     companion_postD_check_identity,
     companion_postD_check_admin,
     companion_postD,
     companion_postR,
     companion_postR_A,
+    companion_detail,
     companion_search_user,
     companion_search_area
 }

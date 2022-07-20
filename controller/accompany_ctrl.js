@@ -2,7 +2,6 @@
 
 const accompanyDAO = require("../model/accompanyDAO");
 const chatDAO = require("../model/chatDAO");
-const socketio = require("../middleware/socketio");
 
 async function companionPost_create(req, res, next) {
     try {
@@ -10,12 +9,23 @@ async function companionPost_create(req, res, next) {
         const title = req.body.title;
         const des = req.body.des;
         const personnel = req.body.personnel;
-        const tag = req.body.tag;
-        const parameter = { user_key, title, des, personnel, tag };
-        console.log(parameter);
+        const tags = req.body.tag;
+        const parameter = { user_key, title, des, personnel, tags };
 
         const db_data = await accompanyDAO.companion_postC(parameter);
         const post_key = db_data.insertId;
+
+        console.log(parameter, '\n post_key: ', post_key);
+
+        const tag = tags.split(', ');
+        const tag_lenght = tag.length;
+
+        for(let i=0; i<tag_lenght; i++) {
+            let tagg = tag[i];
+            const tag_parameter = { post_key, tagg };
+            const tag_data = await accompanyDAO.post_tag(tag_parameter);
+        }
+
         const chat_parameter = {post_key, user_key, title }
         const chat_db_data = await chatDAO.chat_listC_host(chat_parameter);
 
@@ -110,6 +120,21 @@ async function companionPost_read_A(req, res, next) {
     }
 }
 
+async function profile_detail(req, res, next) {
+    try {
+        const user_key = req.params.user_key;
+        //방명록에서 사진도 불러와야 함(나경이 코드?)
+        //user DB에 레벨, 훈장, 고도 추가해야함?
+        //추후에 지도도 불러와야함
+        const db_data = await accompanyDAO.companion_detail(user_key);
+        res.json({
+            "db_data": db_data
+        });
+    } catch (err) {
+        res.send("프로필을 읽어올 수 없습니다.");
+    }
+}
+
 async function companionPost_search_user(req, res, next) {
     try {
         let currentPage = req.query.page;
@@ -172,6 +197,8 @@ async function companionPost_createChat(req, res, next) {
         let db_data = await chatDAO.chat_list_key(post_key);
         db_data = db_data[0];
 
+        console.log(db_data);
+
         res.send("socket_test", { db_data, user_key });
     } catch (err) {
         res.send("통신 오류");
@@ -184,6 +211,7 @@ module.exports = {
     companionPost_delete,
     companionPost_read,
     companionPost_read_A,
+    profile_detail,
     companionPost_search_user,
     companionPost_search_area,
     // companionPost_Deadline_Btn
