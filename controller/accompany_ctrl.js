@@ -197,9 +197,7 @@ async function companionPost_createChat(req, res, next) {
         let db_data = await chatDAO.chat_list_key(post_key);
         db_data = db_data[0];
 
-        console.log(db_data);
-
-        res.send("socket_test", { db_data, user_key });
+        res.render("socket_test", { db_data, user_key });
     } catch (err) {
         res.send("통신 오류");
     }
