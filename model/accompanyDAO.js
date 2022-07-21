@@ -14,7 +14,7 @@ function companion_postC(parameter) {
     });
 }
 
-function post_tag(parameter) {
+function insert_tag(parameter) {
     return new Promise((resolve, reject) => {
         console.log("db start p")
         const queryData = `INSERT INTO tag (post_key, tag_name) values (?, ?)`;
@@ -30,7 +30,19 @@ function companion_postU(parameter) {
     return new Promise((resolve, reject) => {
         console.log("db start p")
         const queryData = `UPDATE accompany SET user_key = ?, title = ?, des = ?, personnel = ?, tag = ? where post_key = ?`;
-        db.query(queryData, [parameter.user_key, parameter.title, parameter.des, parameter.personnel, parameter.tag, parameter.post_key], (err, db_data) => {
+        db.query(queryData, [parameter.user_key, parameter.title, parameter.des, parameter.personnel, parameter.tags, parameter.post_key], (err, db_data) => {
+            console.log(db_data);
+            if(db_data) resolve(db_data);
+            else reject(err);
+        })
+    });
+}
+
+function delete_tag(parameter) {
+    return new Promise((resolve, reject) => {
+        console.log("db start p")
+        const queryData = `DELETE FROM tag where post_key = ?`;
+        db.query(queryData, [parameter], (err, db_data) => {
             console.log(db_data);
             if(db_data) resolve(db_data);
             else reject(err);
@@ -134,8 +146,9 @@ function companion_search_area(parameter) {
 
 module.exports = {  
     companion_postC,
-    post_tag,
+    insert_tag,
     companion_postU,
+    delete_tag,
     companion_postD_check_identity,
     companion_postD_check_admin,
     companion_postD,

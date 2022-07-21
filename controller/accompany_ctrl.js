@@ -2,6 +2,7 @@
 
 const accompanyDAO = require("../model/accompanyDAO");
 const chatDAO = require("../model/chatDAO");
+const pairDAO = require("../model/pairDAO");
 
 async function companionPost_create(req, res, next) {
     try {
@@ -9,13 +10,11 @@ async function companionPost_create(req, res, next) {
         const title = req.body.title;
         const des = req.body.des;
         const personnel = req.body.personnel;
-        const tags = req.body.tag;
+        const tags = req.body.tags;
         const parameter = { user_key, title, des, personnel, tags };
 
         const db_data = await accompanyDAO.companion_postC(parameter);
         const post_key = db_data.insertId;
-
-        console.log(parameter, '\n post_key: ', post_key);
 
         const tag = tags.split(', ');
         const tag_lenght = tag.length;
@@ -23,10 +22,10 @@ async function companionPost_create(req, res, next) {
         for(let i=0; i<tag_lenght; i++) {
             let tagg = tag[i];
             const tag_parameter = { post_key, tagg };
-            const tag_data = await accompanyDAO.post_tag(tag_parameter);
+            const tag_data = await accompanyDAO.insert_tag(tag_parameter);
         }
 
-        const chat_parameter = {post_key, user_key, title }
+        const chat_parameter = { post_key, user_key, title }
         const chat_db_data = await chatDAO.chat_listC_host(chat_parameter);
 
         res.send("success");
@@ -42,9 +41,20 @@ async function companionPost_update(req, res, next) {
         const title = req.body.title;
         const des = req.body.des;
         const personnel = req.body.personnel;
-        const tag = req.body.tag;
-        const parameter = { post_key, user_key, title, des, personnel, tag };
-        console.log(parameter);
+        const tags = req.body.tags;
+
+        const parameter = { post_key, user_key, title, des, personnel, tags };
+
+        const del_tag = await accompanyDAO.delete_tag(post_key);
+
+        const tag = tags.split(', ');
+        const tag_lenght = tag.length;
+
+        for(let i=0; i<tag_lenght; i++) {
+            let tagg = tag[i];
+            const tag_parameter = { post_key, tagg };
+            const tag_data = await accompanyDAO.insert_tag(tag_parameter);
+        }
 
         const db_data = await accompanyDAO.companion_postU(parameter);
         
@@ -109,7 +119,6 @@ async function companionPost_read_A(req, res, next) {
             offset: page.offset,
             limit: page.limit
         }
-        console.log(parameter);
 
         const db_data = await accompanyDAO.companion_postR_A(parameter);
         res.json({
@@ -146,7 +155,6 @@ async function companionPost_search_user(req, res, next) {
             offset: page.offset,
             limit: page.limit
         }
-        console.log(parameter);
 
         const db_data = await accompanyDAO.companion_search_user(parameter);
         res.json({
@@ -168,7 +176,6 @@ async function companionPost_search_area(req, res, next) {
             offset: page.offset,
             limit: page.limit
         }
-        console.log(parameter);
 
         const db_data = await accompanyDAO.companion_search_area(parameter);
         res.json({
@@ -179,17 +186,33 @@ async function companionPost_search_area(req, res, next) {
     }
 }
 
-//짝궁 연결로 보류
-// async function companionPost_Deadline_Btn(req, res, next) {
-//     try {
-        
-//         res.render("main");
-//     } catch (err) {
-//         res.send("error");
-//     }
-// }
+//마감하기 버튼 누를때 짝궁 리스트업 - 호스트버전
+async function companionPost_Deadline_Btn(req, res, next) {
+    try {
+        const post_key = req.params.post_key;
+        const host = req.params.user_key;
+        const mate_key = await pairDAO.load_user_key(post_key);
+        const mate_length = mate_key.length;
 
-//채팅방 (게시글에서 확인버튼을 눌렀을 때)
+        //host는 connect 기본 1로 insert 해둔다
+        const host_data = await pairDAO.insert_pair_hostV(host);
+
+        for(let i=0; i<mate_length; i++) {
+            const parameter = {
+                post_key: post_key,
+                user_key: mate_key[i].user_key
+            }
+            // chat_list에 있는 user_key 모두 pair로 insert
+            const db_data = await pairDAO.insert_pair(parameter);
+        }
+
+        res.send("success");
+    } catch (err) {
+        res.send("error");
+    }
+}
+
+//채팅방 (게시글에서 확인버튼을 눌렀을 때) - 유저버전
 async function companionPost_createChat(req, res, next) {
     try {
         const post_key = req.params.post_key;
@@ -212,6 +235,6 @@ module.exports = {
     profile_detail,
     companionPost_search_user,
     companionPost_search_area,
-    // companionPost_Deadline_Btn
+    companionPost_Deadline_Btn,
     companionPost_createChat
 }
