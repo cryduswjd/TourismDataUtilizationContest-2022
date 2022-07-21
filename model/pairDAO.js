@@ -138,7 +138,7 @@ function save_photo(parameter) {
     return new Promise((resolve, reject) => {
         console.log("db start p")
         const queryData = `INSERT INTO pair(mate_key, user_key, img, type) valuse (?, ?, ?, 1)`;
-        db.query(queryData, [parameter.mate_key, parameter.user_key, parameter.photo], (err, db_data) => {
+        db.query(queryData, [parameter.mate_key, parameter.user_key, parameter.string], (err, db_data) => {
             console.log(db_data);
             if(db_data) resolve(db_data);
             else reject(err);
@@ -151,6 +151,42 @@ function load_photo(parameter) {
         console.log("db start p")
         const queryData = `SELECT img FROM pair where mate_key = ? AND user_key = ? LIMIT ?, ?`;
         db.query(queryData, [parameter.mate_key, parameter.user_key, parameter.offset, parameter.limit], (err, db_data) => {
+            console.log(db_data);
+            if(db_data) resolve(db_data);
+            else reject(err);
+        })
+    });
+}
+
+function user_load_photo(parameter) {
+    return new Promise((resolve, reject) => {
+        console.log("db start p")
+        const queryData = `SELECT name, user.img, pair.img FROM pair LEFT OUTER JOIN user ON pair.user_key = user.user_key where mate_key = ? AND user_key = ? LIMIT ?, ?`;
+        db.query(queryData, [parameter.mate_key, parameter.user_key, parameter.offset, parameter.limit], (err, db_data) => {
+            console.log(db_data);
+            if(db_data) resolve(db_data);
+            else reject(err);
+        })
+    });
+}
+
+function save_todo(parameter) {
+    return new Promise((resolve, reject) => {
+        console.log("db start p")
+        const queryData = `INSERT INTO pair(mate_key, user_key, todo, type) valuse (?, ?, ?, 1)`;
+        db.query(queryData, [parameter.mate_key, parameter.user_key, parameter.todo], (err, db_data) => {
+            console.log(db_data);
+            if(db_data) resolve(db_data);
+            else reject(err);
+        })
+    });
+}
+
+function load_todo(parameter) {
+    return new Promise((resolve, reject) => {
+        console.log("db start p")
+        const queryData = `SELECT todo FROM pair where mate_key = ?`;
+        db.query(queryData, [parameter], (err, db_data) => {
             console.log(db_data);
             if(db_data) resolve(db_data);
             else reject(err);
@@ -171,5 +207,8 @@ module.exports = {
     pair_auth_stop,
     pair_auth_start,
     save_photo,
-    load_photo
+    load_photo,
+    user_load_photo,
+    save_todo,
+    load_todo
 }

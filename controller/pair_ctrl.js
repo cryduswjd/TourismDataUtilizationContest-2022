@@ -86,16 +86,22 @@ async function photo_share(req, res, next) {
     try {
         const mate_key = req.params.mate_key;
         const user_key = req.params.user_key;
-        const photo = req.body.photo;   //아마 list형식으로 수정?
+        const photo = req.files;
+        let str = "";
 
-        //list형식으로 수정하면 값 split으로 짤라서 DB insert
+        for (let i in photo) {
+            console.log(i + " : " + photo[i].filename);
+            str += photo[i].filename + ", ";
+        }
+        const string = str.slice(0, -2);
 
-        const parameter = { mate_key, user_key, photo };
+        const parameter = { mate_key, user_key, string };
+    
         const db_data = await pairDAO.save_photo(parameter);
 
         res.send('success');
     } catch (err) {
-        res.send('사용자 활성화 실패')
+        res.send('사진 공유 오류')
     }
 }
 
@@ -133,7 +139,7 @@ async function show_photo(req, res, next) {
             "db_data": db_data
         });
     } catch (err) {
-        res.send('사용자 활성화 실패')
+        res.send('사진 불러오기 오류')
     }
 }
 
@@ -154,6 +160,8 @@ async function show_all_photo(req, res, next){
             limit: page.limit
         }
 
+        const db_data = await pairDAO.user_load_photo(parameter);
+
         res.json({
             "db_data": db_data
         });
@@ -167,11 +175,27 @@ async function todo_list(req, res, next) {
     try{
         const mate_key = req.params.mate_key;
         const user_key = req.params.user_key;
-        const todo = req.body.todo; //아마 list형식으로 수정?
+        const todo = req.body.todo;
 
+        const parameter = { mate_key, user_key, todo };
 
+        const db_data = await pairDAO.save_todo(parameter);
 
         res.send('success');
+    } catch (err) {
+        res.send('여행 계획이 추가 오류')
+    }
+}
+
+async function show_todo_list(req, res, next) {
+    try{
+        const mate_key = req.params.mate_key;
+
+        const db_data = await pairDAO.save_todo(mate_key);
+
+        res.json({
+            "db_data": db_data
+        })
     } catch (err) {
         res.send('여행 계획이 추가 오류')
     }
@@ -185,5 +209,6 @@ module.exports = {
     photo_share,
     show_photo,
     show_all_photo,
-    todo_list
+    todo_list,
+    show_todo_list
 }
