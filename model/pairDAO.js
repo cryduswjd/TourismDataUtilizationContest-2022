@@ -102,7 +102,7 @@ function user_connect_zero(parameter) {
     return new Promise((resolve, reject) => {
         console.log("db start p")
         const queryData = `UPDATE pair_list SET connect = 0 where post_key =? AND user_key = ?`;
-        db.query(queryData, [parameter.post_key, parameter.mate_key], (err, db_data) => {
+        db.query(queryData, [parameter.post_key, parameter.user_key], (err, db_data) => {
             console.log(db_data);
             if(db_data) resolve(db_data);
             else reject(err);
@@ -114,7 +114,7 @@ function pair_auth_stop(parameter) {
     return new Promise((resolve, reject) => {
         console.log("db start p")
         const queryData = `UPDATE pair SET type = 0 where post_key = ? AND user_key = ?`;
-        db.query(queryData, [parameter.post_key, parameter.mate_key], (err, db_data) => {
+        db.query(queryData, [parameter.post_key, parameter.user_key], (err, db_data) => {
             console.log(db_data);
             if(db_data) resolve(db_data);
             else reject(err);
@@ -134,6 +134,30 @@ function pair_auth_start(parameter) {
     });
 }
 
+function save_photo(parameter) {
+    return new Promise((resolve, reject) => {
+        console.log("db start p")
+        const queryData = `INSERT INTO pair(mate_key, user_key, img, type) valuse (?, ?, ?, 1)`;
+        db.query(queryData, [parameter.mate_key, parameter.user_key, parameter.photo], (err, db_data) => {
+            console.log(db_data);
+            if(db_data) resolve(db_data);
+            else reject(err);
+        })
+    });
+}
+
+function load_photo(parameter) {
+    return new Promise((resolve, reject) => {
+        console.log("db start p")
+        const queryData = `SELECT img FROM pair where mate_key = ? AND user_key = ? LIMIT ?, ?`;
+        db.query(queryData, [parameter.mate_key, parameter.user_key, parameter.offset, parameter.limit], (err, db_data) => {
+            console.log(db_data);
+            if(db_data) resolve(db_data);
+            else reject(err);
+        })
+    });
+}
+
 module.exports = {
     load_user_key,
     load_user_id,
@@ -145,5 +169,7 @@ module.exports = {
     user_connect,
     user_connect_zero,
     pair_auth_stop,
-    pair_auth_start
+    pair_auth_start,
+    save_photo,
+    load_photo
 }

@@ -50,9 +50,9 @@ async function qr_check(req, res, next) {
 async function user_disable(req, res, next) {
     try {
         const post_key = req.params.post_key;
-        const mate_key = req.params.mate_key;
+        const user_key = req.params.user_key;
         
-        const parameter = { post_key, mate_key };
+        const parameter = { post_key, user_key };
         let db_data = await pairDAO.user_connect_zero(parameter);
         //pairDB에서도 권한을 0으로 바꿔 모든 기능 stop
         db_data = await pairDAO.pair_auth_stop(parameter);
@@ -68,7 +68,7 @@ async function user_restart(req, res, next) {
     try {
         const post_key = req.params.post_key;
         //QR체크 코드랑 같은 model을 사용해서 id_to_key로 변수 맞춤
-        const id_to_key = req.params.mate_key;
+        const id_to_key = req.params.user_key;
 
         const parameter = { post_key, id_to_key };
         let db_data = await pairDAO.user_connect(parameter);
@@ -81,9 +81,109 @@ async function user_restart(req, res, next) {
     }
 }
 
+//사진 공유(짝궁 메인)
+async function photo_share(req, res, next) {
+    try {
+        const mate_key = req.params.mate_key;
+        const user_key = req.params.user_key;
+        const photo = req.body.photo;   //아마 list형식으로 수정?
+
+        //list형식으로 수정하면 값 split으로 짤라서 DB insert
+
+        const parameter = { mate_key, user_key, photo };
+        const db_data = await pairDAO.save_photo(parameter);
+
+        res.send('success');
+    } catch (err) {
+        res.send('사용자 활성화 실패')
+    }
+}
+
+const paging = (currentPage, pageSize) => {
+    const default_start_page = 0;
+    const page_size = pageSize;
+    if (currentPage < 0 || !currentPage) currentPage = default_start_page;
+    let result = {
+        offset: (currentPage) * page_size,
+        limit: Number(page_size)
+    }
+    return result;
+}
+
+//공유된 사진 불러오기
+async function show_photo(req, res, next) {
+    try {
+        const mate_key = req.params.mate_key;
+        const user_key = req.params.user_key;
+
+        let currentPage = req.query.page;
+        const pageSize = 10;
+        const page = paging(currentPage, pageSize);
+
+        const parameter = {
+            mate_key: mate_key,
+            user_key: user_key,
+            offset: page.offset,
+            limit: page.limit
+        }
+
+        const db_data = await pairDAO.load_photo(parameter);
+
+        res.json({
+            "db_data": db_data
+        });
+    } catch (err) {
+        res.send('사용자 활성화 실패')
+    }
+}
+
+//사진 전체보기 눌렀을 때
+async function show_all_photo(req, res, next){
+    try{
+        const mate_key = req.params.mate_key;
+        const user_key = req.params.user_key;
+
+        let currentPage = req.query.page;
+        const pageSize = 8;
+        const page = paging(currentPage, pageSize);
+
+        const parameter = {
+            mate_key: mate_key,
+            user_key: user_key,
+            offset: page.offset,
+            limit: page.limit
+        }
+
+        res.json({
+            "db_data": db_data
+        });
+    } catch (err) {
+        res.send('사진 불러오기 오류');
+    }
+}
+
+//여행 계획 공유
+async function todo_list(req, res, next) {
+    try{
+        const mate_key = req.params.mate_key;
+        const user_key = req.params.user_key;
+        const todo = req.body.todo; //아마 list형식으로 수정?
+
+
+
+        res.send('success');
+    } catch (err) {
+        res.send('여행 계획이 추가 오류')
+    }
+}
+
 module.exports = {
     qr_info,
     qr_check,
     user_disable,
-    user_restart
+    user_restart,
+    photo_share,
+    show_photo,
+    show_all_photo,
+    todo_list
 }
