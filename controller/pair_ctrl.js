@@ -185,7 +185,7 @@ async function todo_list(req, res, next) {
 
         res.send('success');
     } catch (err) {
-        res.send('여행 계획이 추가 오류')
+        res.send('여행 계획 추가 오류')
     }
 }
 
@@ -200,7 +200,37 @@ async function show_todo_list(req, res, next) {
             "db_data": db_data
         })
     } catch (err) {
-        res.send('여행 계획이 추가 오류')
+        res.send('여행 계획 불러오기 오류')
+    }
+}
+
+//짝궁 평가 할 때 사용자 프로필 불러오기
+async function rating_user_info(req, res, next) {
+    try{
+        const post_key = req.params.post_key;
+        const user_key = req.params.user_key;
+
+        const parameter = { post_key, user_key };
+        const db_data = await pairDAO.user_profile_info(parameter);
+
+        res.json({
+            "db_data": db_data
+        });
+    } catch (err) {
+        res.send('사용자 정보를 불러올 수 없습니다.')
+    }
+}
+
+//짝궁 평가 (여행 종료 버튼 눌렀을 때)
+async function pair_rate(req, res, next) {
+    try{
+        const post_key = req.params.post_key;
+
+        const db_data = await pairDAO.rating(post_key);
+
+        res.send('success');
+    } catch (err) {
+        res.send('평가 오류')
     }
 }
 
@@ -213,5 +243,7 @@ module.exports = {
     show_photo,
     show_all_photo,
     todo_list,
-    show_todo_list
+    show_todo_list,
+    rating_user_info,
+    pair_rate
 }

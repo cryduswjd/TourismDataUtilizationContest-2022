@@ -30,4 +30,11 @@ router.post('/todo_list/:mate_key/:user_key', pair_ctrl.todo_list);
 //todo 리스트 보여주기
 router.get('/show_todo_list/:mate_key', pair_ctrl.show_todo_list);
 
+
+//짝궁 평가 할 때 짝궁 프로필 불러오기
+router.get('/rating_user_info/:post_key/:user_key', pair_ctrl.rating_user_info);
+//짝궁 평가 (여행 종료 버튼 눌렀을 때)
+router.post('/pair_rate/:post_key', pair_ctrl.pair_rate);
+//여행 종료 버튼 누르고 연결 끊는 라우터
+
 module.exports = router;
