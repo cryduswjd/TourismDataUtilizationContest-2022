@@ -90,12 +90,12 @@ async function photo_share(req, res, next) {
         let str = "";
 
         for (let i in photo) {
-            console.log(i + " : " + photo[i].filename);
             str += photo[i].filename + ", ";
         }
         const string = str.slice(0, -2);
 
         const parameter = { mate_key, user_key, string };
+        console.log(parameter)
     
         const db_data = await pairDAO.save_photo(parameter);
 
@@ -120,7 +120,6 @@ const paging = (currentPage, pageSize) => {
 async function show_photo(req, res, next) {
     try {
         const mate_key = req.params.mate_key;
-        const user_key = req.params.user_key;
 
         let currentPage = req.query.page;
         const pageSize = 10;
@@ -128,7 +127,6 @@ async function show_photo(req, res, next) {
 
         const parameter = {
             mate_key: mate_key,
-            user_key: user_key,
             offset: page.offset,
             limit: page.limit
         }
@@ -145,9 +143,12 @@ async function show_photo(req, res, next) {
 
 //사진 전체보기 눌렀을 때
 async function show_all_photo(req, res, next){
+    console.log('test')
     try{
         const mate_key = req.params.mate_key;
         const user_key = req.params.user_key;
+        console.log(mate_key)
+        console.log(user_key)
 
         let currentPage = req.query.page;
         const pageSize = 8;
@@ -160,6 +161,7 @@ async function show_all_photo(req, res, next){
             limit: page.limit
         }
 
+        console.log(parameter)
         const db_data = await pairDAO.user_load_photo(parameter);
 
         res.json({
@@ -187,11 +189,12 @@ async function todo_list(req, res, next) {
     }
 }
 
+//여행 계획 보여주기
 async function show_todo_list(req, res, next) {
     try{
         const mate_key = req.params.mate_key;
 
-        const db_data = await pairDAO.save_todo(mate_key);
+        const db_data = await pairDAO.load_todo(mate_key);
 
         res.json({
             "db_data": db_data

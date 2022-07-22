@@ -29,7 +29,7 @@ function load_user_id(parameter) {
 function insert_pair(parameter) {
     return new Promise((resolve, reject) => {
         console.log("db start p")
-        const queryData = `INSERT INTO pair_list(post_key, user_key, connect, trip_end) values (?, ?, ?, 0, 0)`;
+        const queryData = `INSERT INTO pair_list(post_key, user_key, connect, trip_end) values (?, ?, 0, 0)`;
         db.query(queryData, [parameter.post_key, parameter.user_key], (err, db_data) => {
             console.log(db_data);
             if(db_data) resolve(db_data);
@@ -41,8 +41,8 @@ function insert_pair(parameter) {
 function insert_pair_hostV(parameter) {
     return new Promise((resolve, reject) => {
         console.log("db start p")
-        const queryData = `INSERT INTO pair_list(post_key, user_key, connect, trip_end) values (?, ?, ?, 1, 0)`;
-        db.query(queryData, [parameter.post_key, parameter.user_key], (err, db_data) => {
+        const queryData = `INSERT INTO pair_list(post_key, user_key, connect, trip_end) values (?, ?, 1, 0)`;
+        db.query(queryData, [parameter.post_key, parameter.host], (err, db_data) => {
             console.log(db_data);
             if(db_data) resolve(db_data);
             else reject(err);
@@ -137,7 +137,7 @@ function pair_auth_start(parameter) {
 function save_photo(parameter) {
     return new Promise((resolve, reject) => {
         console.log("db start p")
-        const queryData = `INSERT INTO pair(mate_key, user_key, img, type) valuse (?, ?, ?, 1)`;
+        const queryData = `INSERT INTO pair(mate_key, user_key, img, type) values (?, ?, ?, 1)`;
         db.query(queryData, [parameter.mate_key, parameter.user_key, parameter.string], (err, db_data) => {
             console.log(db_data);
             if(db_data) resolve(db_data);
@@ -149,8 +149,8 @@ function save_photo(parameter) {
 function load_photo(parameter) {
     return new Promise((resolve, reject) => {
         console.log("db start p")
-        const queryData = `SELECT img FROM pair where mate_key = ? AND user_key = ? LIMIT ?, ?`;
-        db.query(queryData, [parameter.mate_key, parameter.user_key, parameter.offset, parameter.limit], (err, db_data) => {
+        const queryData = `SELECT img FROM pair where mate_key = ? LIMIT ?, ?`;
+        db.query(queryData, [parameter.mate_key, parameter.offset, parameter.limit], (err, db_data) => {
             console.log(db_data);
             if(db_data) resolve(db_data);
             else reject(err);
@@ -161,7 +161,7 @@ function load_photo(parameter) {
 function user_load_photo(parameter) {
     return new Promise((resolve, reject) => {
         console.log("db start p")
-        const queryData = `SELECT name, user.img, pair.img FROM pair LEFT OUTER JOIN user ON pair.user_key = user.user_key where mate_key = ? AND user_key = ? LIMIT ?, ?`;
+        const queryData = `SELECT nickname, user.img, pair.img FROM pair LEFT OUTER JOIN user ON pair.user_key = user.user_key where mate_key = ? AND pair.user_key = ? LIMIT ?, ?`;
         db.query(queryData, [parameter.mate_key, parameter.user_key, parameter.offset, parameter.limit], (err, db_data) => {
             console.log(db_data);
             if(db_data) resolve(db_data);
@@ -173,7 +173,7 @@ function user_load_photo(parameter) {
 function save_todo(parameter) {
     return new Promise((resolve, reject) => {
         console.log("db start p")
-        const queryData = `INSERT INTO pair(mate_key, user_key, todo, type) valuse (?, ?, ?, 1)`;
+        const queryData = `INSERT INTO pair(mate_key, user_key, todo, type) values (?, ?, ?, 1)`;
         db.query(queryData, [parameter.mate_key, parameter.user_key, parameter.todo], (err, db_data) => {
             console.log(db_data);
             if(db_data) resolve(db_data);

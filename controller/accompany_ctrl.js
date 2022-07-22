@@ -194,16 +194,22 @@ async function companionPost_Deadline_Btn(req, res, next) {
         const mate_key = await pairDAO.load_user_key(post_key);
         const mate_length = mate_key.length;
 
-        //host는 connect 기본 1로 insert 해둔다
-        const host_data = await pairDAO.insert_pair_hostV(host);
+        console.log(mate_key)
+
+        let parameter = { post_key, host };
+         //host는 connect 기본 1로 insert 해둔다
+        const host_data = await pairDAO.insert_pair_hostV(parameter);
+
 
         for(let i=0; i<mate_length; i++) {
-            const parameter = {
-                post_key: post_key,
-                user_key: mate_key[i].user_key
+            if (mate_key[i].user_key != host) {
+                parameter = {
+                    post_key: post_key,
+                    user_key: mate_key[i].user_key
+                }
+                // chat_list에 있는 user_key 모두 pair로 insert
+                const db_data = await pairDAO.insert_pair(parameter);
             }
-            // chat_list에 있는 user_key 모두 pair로 insert
-            const db_data = await pairDAO.insert_pair(parameter);
         }
 
         res.send("success");

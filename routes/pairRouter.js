@@ -20,9 +20,11 @@ router.post('/user_restart/:post_key/:user_key', pair_ctrl.user_restart);
 //사진 공유 (짝궁 메인)
 router.post('/photo_share/:mate_key/:user_key', multer.uploadAction.array("images", 10), pair_ctrl.photo_share);
 //사진 공유 보여주기 (짝궁 메인 sql_paging 10개씩)
-router.get('/show_photo/:mate_key/:user_key', pair_ctrl.show_photo);
+router.get('/show_photo/:mate_key', pair_ctrl.show_photo);
 //사진 공유 (짝궁 메인에서 전체 보기 눌렀을 때)
-router.get('show_all_photo/:mate_key/:user_key', pair_ctrl.show_all_photo);
+router.get('/show_all_photo/:mate_key/:user_key', pair_ctrl.show_all_photo);
+
+
 //todo 리스트 공유
 router.post('/todo_list/:mate_key/:user_key', pair_ctrl.todo_list);
 //todo 리스트 보여주기
