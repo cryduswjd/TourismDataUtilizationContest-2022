@@ -144,6 +144,18 @@ function companion_search_area(parameter) {
     });
 }
 
+function check_deadline(parameter) {
+    return new Promise((resolve, reject) => {
+        console.log("db start p")
+        const queryData = `UPDATE accompany SET deadline = 1 where post_key = ? AND user_key = ?`;
+        db.query(queryData, [parameter.post_key, parameter.host], (err, db_data) => {
+            console.log(db_data);
+            if(db_data) resolve(db_data);
+            else reject(err);
+        })
+    });
+}
+
 module.exports = {  
     companion_postC,
     insert_tag,
@@ -156,5 +168,6 @@ module.exports = {
     companion_postR_A,
     companion_detail,
     companion_search_user,
-    companion_search_area
+    companion_search_area,
+    check_deadline
 }

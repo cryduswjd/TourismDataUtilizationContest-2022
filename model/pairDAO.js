@@ -134,6 +134,18 @@ function pair_auth_start(parameter) {
     });
 }
 
+function load_mate_key(parameter) {
+    return new Promise((resolve, reject) => {
+        console.log("db start p")
+        const queryData = `SELECT mate_key FROM pair_list where post_key = ? AND user_key = ?`;
+        db.query(queryData, [parameter.post_key, parameter.user_key], (err, db_data) => {
+            console.log(db_data);
+            if(db_data) resolve(db_data);
+            else reject(err);
+        })
+    });
+}
+
 function save_photo(parameter) {
     return new Promise((resolve, reject) => {
         console.log("db start p")
@@ -208,11 +220,35 @@ function user_profile_info(parameter) {
     });
 }
 
-function rating(parameter) {
+function user_rating(parameter) {
     return new Promise((resolve, reject) => {
         console.log("db start p")
-        const queryData = ``;
-        db.query(queryData, [parameter], (err, db_data) => {
+        const queryData = `INSERT INTO pair_rating (mate_key, post_key, user_key, rate) values (?, ?, ?, ?)`;
+        db.query(queryData, [parameter.mate_key, parameter.post_key, parameter.user_key, parameter.rate], (err, db_data) => {
+            console.log(db_data);
+            if(db_data) resolve(db_data);
+            else reject(err);
+        })
+    });
+}
+
+function disconnect(parameter) {
+    return new Promise((resolve, reject) => {
+        console.log("db start p")
+        const queryData = `UPDATE pair_list SET connect = 0 where post_key = ? AND user_key = ?`;
+        db.query(queryData, [parameter.post_key, parameter.user_key], (err, db_data) => {
+            console.log(db_data);
+            if(db_data) resolve(db_data);
+            else reject(err);
+        })
+    });
+}
+
+function end_of_trip(parameter) {
+    return new Promise((resolve, reject) => {
+        console.log("db start p")
+        const queryData = `UPDATE pair_list SET trip_end = 1 where post_key = ? AND user_key = ?`;
+        db.query(queryData, [parameter.post_key, parameter.user_key], (err, db_data) => {
             console.log(db_data);
             if(db_data) resolve(db_data);
             else reject(err);
@@ -232,11 +268,14 @@ module.exports = {
     user_connect_zero,
     pair_auth_stop,
     pair_auth_start,
+    load_mate_key,
     save_photo,
     load_photo,
     user_load_photo,
     save_todo,
     load_todo,
     user_profile_info,
-    rating
+    user_rating,
+    disconnect,
+    end_of_trip
 }

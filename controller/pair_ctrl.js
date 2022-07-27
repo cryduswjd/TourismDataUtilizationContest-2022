@@ -1,6 +1,5 @@
 "use strict"
 
-const accompanyDAO = require("../model/accompanyDAO");
 const pairDAO = require("../model/pairDAO");
 
 //큐알에 쓰이는 정보 보내주기 - 사용자버전
@@ -84,9 +83,11 @@ async function user_restart(req, res, next) {
 //사진 공유(짝궁 메인)
 async function photo_share(req, res, next) {
     try {
-        const mate_key = req.params.mate_key;
+        const post_key = req.params.post_key;
         const user_key = req.params.user_key;
         const photo = req.files;
+
+        //사진 한번에 받아서 DB에 한 줄씩 넣기
         let str = "";
 
         for (let i in photo) {
@@ -94,9 +95,12 @@ async function photo_share(req, res, next) {
         }
         const string = str.slice(0, -2);
 
-        const parameter = { mate_key, user_key, string };
-        console.log(parameter)
-    
+        //post_key와 user_key를 사용하여 mate_key 불러오기
+        let parameter = { post_key, user_key };
+        let mate_key = await pairDAO.load_mate_key(parameter);
+        mate_key = mate_key[0].mate_key;
+
+        parameter = { mate_key, user_key, string };
         const db_data = await pairDAO.save_photo(parameter);
 
         res.send('success');
@@ -175,12 +179,15 @@ async function show_all_photo(req, res, next){
 //여행 계획 공유
 async function todo_list(req, res, next) {
     try{
-        const mate_key = req.params.mate_key;
+        const post_key = req.params.post_key;
         const user_key = req.params.user_key;
         const todo = req.body.todo;
 
-        const parameter = { mate_key, user_key, todo };
+        let parameter = { post_key, user_key };
+        let mate_key = await pairDAO.load_mate_key(parameter);
+        mate_key = mate_key[0].mate_key;
 
+        parameter = { mate_key, user_key, todo };
         const db_data = await pairDAO.save_todo(parameter);
 
         res.send('success');
@@ -225,10 +232,31 @@ async function rating_user_info(req, res, next) {
 async function pair_rate(req, res, next) {
     try{
         const post_key = req.params.post_key;
+        //여러명일 경우를 생각해서 리스트?로 값을 한번에 받아올 것임
+        const user_keys = req.body.user_keys;
+        const ratings = req.body.ratings;
 
-        const db_data = await pairDAO.rating(post_key);
+        const user_key_ = user_keys.split(', ');
+        const rating = ratings.split(', ');
 
-        res.send('success');
+        const user_len = user_key_.length;
+
+        for(let i=0; i<user_len; i++) {
+            let user_key = user_key_[i];
+            let rate = rating[i];
+            let parameter = { post_key, user_key };
+
+            let mate_key = await pairDAO.load_mate_key(parameter);
+            mate_key = mate_key[0].mate_key;
+
+            parameter = { mate_key, post_key, user_key, rate };
+            console.log(parameter)
+
+            let db_data = await pairDAO.user_rating(parameter);
+            let disconnect = await pairDAO.disconnect(parameter);
+            let trip_end = await pairDAO.end_of_trip(parameter);
+        };
+        res.send('success');    
     } catch (err) {
         res.send('평가 오류')
     }

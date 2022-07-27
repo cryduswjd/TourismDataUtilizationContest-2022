@@ -194,12 +194,9 @@ async function companionPost_Deadline_Btn(req, res, next) {
         const mate_key = await pairDAO.load_user_key(post_key);
         const mate_length = mate_key.length;
 
-        console.log(mate_key)
-
         let parameter = { post_key, host };
          //host는 connect 기본 1로 insert 해둔다
         const host_data = await pairDAO.insert_pair_hostV(parameter);
-
 
         for(let i=0; i<mate_length; i++) {
             if (mate_key[i].user_key != host) {
@@ -211,6 +208,9 @@ async function companionPost_Deadline_Btn(req, res, next) {
                 const db_data = await pairDAO.insert_pair(parameter);
             }
         }
+
+        parameter = { post_key, host };
+        const deadline = await accompanyDAO.check_deadline(parameter);
 
         res.send("success");
     } catch (err) {

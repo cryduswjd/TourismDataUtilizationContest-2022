@@ -24,7 +24,7 @@ router.get('/companion_detail/:user_key', accompany_ctrl.profile_detail);
 router.get('/companionPost_search_user', accompany_ctrl.companionPost_search_user);
 //동행 게시글 검색_지역o
 router.get('/companionPost_search_area', accompany_ctrl.companionPost_search_area);
-//동행 게시글 마감하기 눌렀을 때 짝궁 리스트 업 o
+//동행 게시글 마감하기 눌렀을 때 짝궁 리스트 업 & deadline DB=1로 update o
 router.post('/companionDeadline_Btn/:post_key/:user_key', accompany_ctrl.companionPost_Deadline_Btn);
 //동행 채팅 참여 눌렀을 때 보여지는 화면과 socket 통신 o
 router.get('/companionPostC_chat/:post_key/:user_key', accompany_ctrl.companionPost_createChat);

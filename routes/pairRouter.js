@@ -18,7 +18,7 @@ router.post('/user_restart/:post_key/:user_key', pair_ctrl.user_restart);
 
 
 //사진 공유 (짝궁 메인)
-router.post('/photo_share/:mate_key/:user_key', multer.uploadAction.array("images", 10), pair_ctrl.photo_share);
+router.post('/photo_share/:post_key/:user_key', multer.uploadAction.array("images", 10), pair_ctrl.photo_share);
 //사진 공유 보여주기 (짝궁 메인 sql_paging 10개씩)
 router.get('/show_photo/:mate_key', pair_ctrl.show_photo);
 //사진 공유 (짝궁 메인에서 전체 보기 눌렀을 때)
@@ -26,15 +26,14 @@ router.get('/show_all_photo/:mate_key/:user_key', pair_ctrl.show_all_photo);
 
 
 //todo 리스트 공유
-router.post('/todo_list/:mate_key/:user_key', pair_ctrl.todo_list);
+router.post('/todo_list/:post_key/:user_key', pair_ctrl.todo_list);
 //todo 리스트 보여주기
 router.get('/show_todo_list/:mate_key', pair_ctrl.show_todo_list);
 
 
 //짝궁 평가 할 때 짝궁 프로필 불러오기
 router.get('/rating_user_info/:post_key/:user_key', pair_ctrl.rating_user_info);
-//짝궁 평가 (여행 종료 버튼 눌렀을 때)
+//짝궁 평가 (확인을 눌러서 DB에 저장됨과 동시에 connect=1로, trip_end=1로 update)
 router.post('/pair_rate/:post_key', pair_ctrl.pair_rate);
-//여행 종료 버튼 누르고 연결 끊는 라우터
 
 module.exports = router;
