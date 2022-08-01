@@ -4,6 +4,17 @@ const accompanyDAO = require("../model/accompanyDAO");
 const chatDAO = require("../model/chatDAO");
 const pairDAO = require("../model/pairDAO");
 
+async function accompany_main(req, res, next) {
+    try {
+
+        res.json({
+            "db_data": db_data
+        })
+    } catch (err) {
+        res.send("메인 페이지 오류")
+    }
+}
+
 async function companionPost_create(req, res, next) {
     try {
         const user_key = req.body.user_key;
@@ -218,6 +229,22 @@ async function companionPost_Deadline_Btn(req, res, next) {
     }
 }
 
+//마감 인원 보여주기
+async function closing_people(req, res, next) {
+    try {
+        const post_key = req.params.post_key;
+        const personnel = await accompanyDAO.check_personnel(post_key);
+        const close_personnel = await accompanyDAO.check_close_personnel(post_key);
+        const db_data = { personnel, close_personnel };
+
+        res.json({
+            "db_data": db_data
+        })
+    } catch (err) {
+        res.send("마감 인원 불러오기 오류");
+    }
+}
+
 //채팅방 (게시글에서 확인버튼을 눌렀을 때) - 유저버전
 async function companionPost_createChat(req, res, next) {
     try {
@@ -233,6 +260,7 @@ async function companionPost_createChat(req, res, next) {
 }
 
 module.exports = {
+    accompany_main,
     companionPost_create,
     companionPost_update,
     companionPost_delete,
@@ -242,5 +270,6 @@ module.exports = {
     companionPost_search_user,
     companionPost_search_area,
     companionPost_Deadline_Btn,
+    closing_people,
     companionPost_createChat
 }

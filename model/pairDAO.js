@@ -101,8 +101,20 @@ function user_connect(parameter) {
 function user_connect_zero(parameter) {
     return new Promise((resolve, reject) => {
         console.log("db start p")
-        const queryData = `UPDATE pair_list SET connect = 0 where post_key =? AND user_key = ?`;
-        db.query(queryData, [parameter.post_key, parameter.user_key], (err, db_data) => {
+        const queryData = `UPDATE pair_list SET connect = 0 where mate_key =? AND user_key = ?`;
+        db.query(queryData, [parameter.mate_key, parameter.user_key], (err, db_data) => {
+            console.log(db_data);
+            if(db_data) resolve(db_data);
+            else reject(err);
+        })
+    });
+}
+
+function user_connect_one(parameter) {
+    return new Promise((resolve, reject) => {
+        console.log("db start p")
+        const queryData = `UPDATE pair_list SET connect = 1 where mate_key =? AND user_key = ?`;
+        db.query(queryData, [parameter.mate_key, parameter.user_key], (err, db_data) => {
             console.log(db_data);
             if(db_data) resolve(db_data);
             else reject(err);
@@ -113,8 +125,8 @@ function user_connect_zero(parameter) {
 function pair_auth_stop(parameter) {
     return new Promise((resolve, reject) => {
         console.log("db start p")
-        const queryData = `UPDATE pair SET type = 0 where post_key = ? AND user_key = ?`;
-        db.query(queryData, [parameter.post_key, parameter.user_key], (err, db_data) => {
+        const queryData = `UPDATE pair SET type = 0 where mate_key = ? AND user_key = ?`;
+        db.query(queryData, [parameter.mate_key, parameter.user_key], (err, db_data) => {
             console.log(db_data);
             if(db_data) resolve(db_data);
             else reject(err);
@@ -125,8 +137,8 @@ function pair_auth_stop(parameter) {
 function pair_auth_start(parameter) {
     return new Promise((resolve, reject) => {
         console.log("db start p")
-        const queryData = `UPDATE pair SET type = 1 where post_key = ? AND user_key = ?`;
-        db.query(queryData, [parameter.post_key, parameter.mate_key], (err, db_data) => {
+        const queryData = `UPDATE pair SET type = 1 where mate_key = ? AND user_key = ?`;
+        db.query(queryData, [parameter.mate_key, parameter.user_key], (err, db_data) => {
             console.log(db_data);
             if(db_data) resolve(db_data);
             else reject(err);
@@ -161,7 +173,7 @@ function save_photo(parameter) {
 function load_photo(parameter) {
     return new Promise((resolve, reject) => {
         console.log("db start p")
-        const queryData = `SELECT img FROM pair where mate_key = ? LIMIT ?, ?`;
+        const queryData = `SELECT img FROM pair where mate_key = ? AND img IS NOT NULL LIMIT ?, ?`;
         db.query(queryData, [parameter.mate_key, parameter.offset, parameter.limit], (err, db_data) => {
             console.log(db_data);
             if(db_data) resolve(db_data);
@@ -173,7 +185,9 @@ function load_photo(parameter) {
 function user_load_photo(parameter) {
     return new Promise((resolve, reject) => {
         console.log("db start p")
-        const queryData = `SELECT nickname, user.img, pair.img FROM pair LEFT OUTER JOIN user ON pair.user_key = user.user_key where mate_key = ? AND pair.user_key = ? LIMIT ?, ?`;
+        const queryData = `SELECT nickname, user.img, pair.img FROM pair 
+                           LEFT OUTER JOIN user ON pair.user_key = user.user_key 
+                           where mate_key = ? AND pair.user_key = ? AND pair.img IS NOT NULL LIMIT ?, ?`;
         db.query(queryData, [parameter.mate_key, parameter.user_key, parameter.offset, parameter.limit], (err, db_data) => {
             console.log(db_data);
             if(db_data) resolve(db_data);
@@ -197,7 +211,7 @@ function save_todo(parameter) {
 function load_todo(parameter) {
     return new Promise((resolve, reject) => {
         console.log("db start p")
-        const queryData = `SELECT todo FROM pair where mate_key = ?`;
+        const queryData = `SELECT todo FROM pair where mate_key = ? AND todo IS NOT NULL`;
         db.query(queryData, [parameter], (err, db_data) => {
             console.log(db_data);
             if(db_data) resolve(db_data);
@@ -210,8 +224,8 @@ function user_profile_info(parameter) {
     return new Promise((resolve, reject) => {
         console.log("db start p")
         const queryData = `SELECT nickname, img FROM user 
-        LEFT OUTER JOIN pair_list ON user.user_key = pair_list.user_key 
-        WHERE post_key = ? AND pair_list.user_key = ?`;
+                           LEFT OUTER JOIN pair_list ON user.user_key = pair_list.user_key 
+                           WHERE post_key = ? AND pair_list.user_key = ?`;
         db.query(queryData, [parameter.post_key, parameter.user_key], (err, db_data) => {
             console.log(db_data);
             if(db_data) resolve(db_data);
@@ -266,6 +280,7 @@ module.exports = {
     get_user_key,
     user_connect,
     user_connect_zero,
+    user_connect_one,
     pair_auth_stop,
     pair_auth_start,
     load_mate_key,

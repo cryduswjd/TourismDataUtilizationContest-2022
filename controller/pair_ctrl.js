@@ -9,7 +9,7 @@ async function qr_info(req, res, next) {
         const db_data = await pairDAO.load_user_id(user_key);
 
         res.json({
-            "db_data": qr_data
+            "db_data": db_data
         });
     } catch (err) {
         res.send('OR 정보 전송 오류')
@@ -27,12 +27,10 @@ async function qr_check(req, res, next) {
         //user_id값 가져옴
         let qr_data = await pairDAO.user_check(parameter);
         qr_data = qr_data[0].id;
-        console.log('qr_data: ' + qr_data);
 
         //user_key값 가져옴
         let id_to_key = await pairDAO.get_user_key(qr_data);
         id_to_key = id_to_key[0].user_key;
-        console.log('key: ' + id_to_key);
 
         parameter = {post_key, id_to_key};
 
@@ -48,10 +46,10 @@ async function qr_check(req, res, next) {
 //사용자 비활성화 시키기(짝궁 리스트에서 x버튼 눌렀을 때)
 async function user_disable(req, res, next) {
     try {
-        const post_key = req.params.post_key;
+        const mate_key = req.params.mate_key;
         const user_key = req.params.user_key;
         
-        const parameter = { post_key, user_key };
+        const parameter = { mate_key, user_key };
         let db_data = await pairDAO.user_connect_zero(parameter);
         //pairDB에서도 권한을 0으로 바꿔 모든 기능 stop
         db_data = await pairDAO.pair_auth_stop(parameter);
@@ -65,12 +63,11 @@ async function user_disable(req, res, next) {
 //사용자 활성화 시키기
 async function user_restart(req, res, next) {
     try {
-        const post_key = req.params.post_key;
-        //QR체크 코드랑 같은 model을 사용해서 id_to_key로 변수 맞춤
-        const id_to_key = req.params.user_key;
+        const mate_key = req.params.mate_key;
+        const user_key = req.params.user_key;
 
-        const parameter = { post_key, id_to_key };
-        let db_data = await pairDAO.user_connect(parameter);
+        const parameter = { mate_key, user_key };
+        let db_data = await pairDAO.user_connect_one(parameter);
         //pairDB에서도 권한을 1로 바꿔 모든 기능 실행
         db_data = await pairDAO.pair_auth_start(parameter);
 
@@ -89,7 +86,6 @@ async function photo_share(req, res, next) {
 
         //사진 한번에 받아서 DB에 한 줄씩 넣기
         let str = "";
-
         for (let i in photo) {
             str += photo[i].filename + ", ";
         }
@@ -147,15 +143,12 @@ async function show_photo(req, res, next) {
 
 //사진 전체보기 눌렀을 때
 async function show_all_photo(req, res, next){
-    console.log('test')
     try{
         const mate_key = req.params.mate_key;
         const user_key = req.params.user_key;
-        console.log(mate_key)
-        console.log(user_key)
 
         let currentPage = req.query.page;
-        const pageSize = 8;
+        const pageSize = 15;
         const page = paging(currentPage, pageSize);
 
         const parameter = {
@@ -200,7 +193,6 @@ async function todo_list(req, res, next) {
 async function show_todo_list(req, res, next) {
     try{
         const mate_key = req.params.mate_key;
-
         const db_data = await pairDAO.load_todo(mate_key);
 
         res.json({
@@ -232,7 +224,6 @@ async function rating_user_info(req, res, next) {
 async function pair_rate(req, res, next) {
     try{
         const post_key = req.params.post_key;
-        //여러명일 경우를 생각해서 리스트?로 값을 한번에 받아올 것임
         const user_keys = req.body.user_keys;
         const ratings = req.body.ratings;
 
@@ -253,6 +244,7 @@ async function pair_rate(req, res, next) {
             console.log(parameter)
 
             let db_data = await pairDAO.user_rating(parameter);
+            //연결 끊기
             let disconnect = await pairDAO.disconnect(parameter);
             let trip_end = await pairDAO.end_of_trip(parameter);
         };

@@ -156,6 +156,32 @@ function check_deadline(parameter) {
     });
 }
 
+function check_personnel(parameter) {
+    return new Promise((resolve, reject) => {
+        console.log("db start p")
+        const queryData = `SELECT personnel FROM accompany where post_key = ?`;
+        db.query(queryData, [parameter], (err, db_data) => {
+            console.log(db_data);
+            if(db_data) resolve(db_data);
+            else reject(err);
+        })
+    });
+}
+
+function check_close_personnel(parameter) {
+    return new Promise((resolve, reject) => {
+        console.log("db start p")
+        const queryData = `SELECT chat_list.personnel FROM chat_list 
+                           LEFT OUTER JOIN accompany ON chat_list.user_key = accompany.user_key
+                           where accompany.post_key = ?`;
+        db.query(queryData, [parameter], (err, db_data) => {
+            console.log(db_data);
+            if(db_data) resolve(db_data);
+            else reject(err);
+        })
+    });
+}
+
 module.exports = {  
     companion_postC,
     insert_tag,
@@ -169,5 +195,7 @@ module.exports = {
     companion_detail,
     companion_search_user,
     companion_search_area,
-    check_deadline
+    check_deadline,
+    check_personnel,
+    check_close_personnel
 }

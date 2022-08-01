@@ -4,8 +4,8 @@ const express = require("express");
 const router = express.Router();
 const accompany_ctrl = require("../controller/accompany_ctrl");
 
-//동행 메인
-
+//동행 메인x
+router.get('/accompany_main', accompany_ctrl.accompany_main);
 //동행 게시글 쓰기o
 router.post('/companionPostC', accompany_ctrl.companionPost_create);
 //동행 게시글 수정o
@@ -26,8 +26,10 @@ router.get('/companionPost_search_user', accompany_ctrl.companionPost_search_use
 router.get('/companionPost_search_area', accompany_ctrl.companionPost_search_area);
 //동행 게시글 마감하기 눌렀을 때 짝궁 리스트 업 & deadline DB=1로 update o
 router.post('/companionDeadline_Btn/:post_key/:user_key', accompany_ctrl.companionPost_Deadline_Btn);
-//동행 채팅 참여 눌렀을 때 보여지는 화면과 socket 통신 o
+//동행 마감 인원o
+router.get('/closing_people/:post_key', accompany_ctrl.closing_people);
+//동행 채팅 참여 눌렀을 때 보여지는 화면과 socket 통신o 
+//AND 채팅방 추방시키기 x
 router.get('/companionPostC_chat/:post_key/:user_key', accompany_ctrl.companionPost_createChat);
-//동행인 추방하기(채팅 DB에서 삭제시키기) x
 
 module.exports = router;
