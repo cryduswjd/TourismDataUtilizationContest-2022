@@ -146,11 +146,23 @@ function pair_auth_start(parameter) {
     });
 }
 
-function load_mate_key(parameter) {
+function load_mate_key_forUser(parameter) {
     return new Promise((resolve, reject) => {
         console.log("db start p")
         const queryData = `SELECT mate_key FROM pair_list where post_key = ? AND user_key = ?`;
         db.query(queryData, [parameter.post_key, parameter.user_key], (err, db_data) => {
+            console.log(db_data);
+            if(db_data) resolve(db_data);
+            else reject(err);
+        })
+    });
+}
+
+function load_mate_key_forPost(parameter) {
+    return new Promise((resolve, reject) => {
+        console.log("db start p")
+        const queryData = `SELECT mate_key FROM pair_list where post_key = ?`;
+        db.query(queryData, [parameter], (err, db_data) => {
             console.log(db_data);
             if(db_data) resolve(db_data);
             else reject(err);
@@ -270,6 +282,18 @@ function end_of_trip(parameter) {
     });
 }
 
+function type_zero(parameter) {
+    return new Promise((resolve, reject) => {
+        console.log("db start p")
+        const queryData = `UPDATE pair SET type = 0 where user_key = ?`;
+        db.query(queryData, [parameter], (err, db_data) => {
+            console.log(db_data);
+            if(db_data) resolve(db_data);
+            else reject(err);
+        })
+    });
+}
+
 module.exports = {
     load_user_key,
     load_user_id,
@@ -283,7 +307,8 @@ module.exports = {
     user_connect_one,
     pair_auth_stop,
     pair_auth_start,
-    load_mate_key,
+    load_mate_key_forUser,
+    load_mate_key_forPost,
     save_photo,
     load_photo,
     user_load_photo,
@@ -292,5 +317,6 @@ module.exports = {
     user_profile_info,
     user_rating,
     disconnect,
-    end_of_trip
+    end_of_trip,
+    type_zero
 }
