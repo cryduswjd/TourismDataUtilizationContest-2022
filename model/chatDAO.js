@@ -71,6 +71,19 @@ function plus_personnel(parameter) {
     });
 }
 
+//동행 참여인원 -
+function minus_personnel(parameter) {
+    return new Promise((resolve, reject) => {
+        console.log("db start p")
+        const queryData = `UPDATE chat_list SET personnel = personnel - 1 where room_key = ?`;
+        db.query(queryData, [parameter], (err, db_data) => {
+            console.log(db_data);
+            if(db_data) resolve(db_data);
+            else reject(err);
+        })
+    });
+}
+
 //동행 채팅방 리스트
 function chat_list_accompanyC(parameter) {
     return new Promise((resolve, reject) => {
@@ -92,7 +105,7 @@ function chat_list_accompanyC(parameter) {
 function chat_listC_host(parameter) {
     return new Promise((resolve, reject) => {
         console.log("db start p")
-        const queryData = `INSERT INTO chat_list(user_key, post_key, title, type, personnel) values (?, ?, ?, 1, 1)`;
+        const queryData = `INSERT INTO chat_list(user_key, post_key, title, type, personnel) values (?, ?, ?, 1, 0)`;
         db.query(queryData, [parameter.user_key, parameter.post_key, parameter.title], (err, db_data) => {
             console.log(db_data);
             if(db_data){
@@ -103,6 +116,18 @@ function chat_listC_host(parameter) {
             }
         })
     });
+}
+
+//채팅 리스트 정보 불러오기
+function chat_list_info(parameter) {
+    return new Promise((resolve, reject) => {
+        const queryData = `SELECT room_key, user_key, post_key, title, type FROM chat_list where post_key = ?`;
+        db.query(queryData, [parameter], (err, db_data) => {
+            console.log(db_data);
+            if(db_data) resolve(db_data);
+            else reject(err);
+        })
+    })
 }
 
 //채팅방 내 메시지 DB 삽입
@@ -190,18 +215,73 @@ function chatRoom_friend(parameter) {
     });
 }
 
+//채팅 내용 불러오기
+function read_content(paramter) {
+    return new Promise((resolve, reject) => {
+        console.log("db start p");
+        const queryData = `SELECT chating.user_key, msg, date, type FROM chating LEFT OUTER JOIN chat_list ON chating.room_key = chat_list.room_key where chating.user_key = ?`;
+        db.query(queryData, [paramter], (err, db_data) => {
+            console.log(db_data);
+            if(db_data) resolve(db_data);
+            else reject(err);
+        })
+    })
+}
+
+//채팅방에 있는 모든 사람 불러오기
+function read_user(parameter) {
+    return new Promise((resolve, reject) => {
+        console.log('db start p');
+        const queryData = `SELECT user_key FROM chat_list where room_key = ?`;
+        db.query(queryData, [parameter], (err, db_data) => {
+            console.log(db_data);
+            if(db_data) resolve(db_data);
+            else reject(err);
+        })
+    })
+}
+
+function modify_user_name(parameter) {
+    return new Promise((resolve, rejcet) => {
+        const queryData = `SELECT nickname FROM user where user_key = ?`;
+        db.query(queryData, [parameter], (err, db_data) => {
+            console.log(db_data);
+            if(db_data) resolve(db_data);
+            else reject(err);
+        })
+    })
+}
+
+function chat_exit(parameter) {
+    return new Promise((resolve, reject) => {
+        console.log('db start p');
+        const queryData = `DELETE FROM chat_list where room_key = ? AND user_key = ?`;
+        db.query(queryData, [parameter.room_key, parameter.user_key], (err, db_data) => {
+            console.log(db_data);
+            if(db_data) resolve(db_data);
+            else reject(err);
+        })
+    })
+}
+
 module.exports = {  
     chat_listR,
     chat_read_each,
     chat_listR_socket,
     chat_list_key,
     plus_personnel,
+    minus_personnel,
     chat_list_accompanyC,
     chat_listC_host,
+    chat_list_info,
     chat_companion,
     chat_companion_R,
     chatRoom_companion,
     chat_list_friendC,
     listC_load_name,
-    chatRoom_friend
+    chatRoom_friend,
+    read_content,
+    read_user,
+    modify_user_name,
+    chat_exit
 }

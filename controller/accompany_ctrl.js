@@ -4,11 +4,39 @@ const accompanyDAO = require("../model/accompanyDAO");
 const chatDAO = require("../model/chatDAO");
 const pairDAO = require("../model/pairDAO");
 
+const paging = (currentPage, pageSize) => {
+    const default_start_page = 0;
+    const page_size = pageSize;
+    if (currentPage < 0 || !currentPage) currentPage = default_start_page;
+    let result = {
+        offset: (currentPage) * page_size,
+        limit: Number(page_size)
+    }
+    return result;
+}
+
 async function accompany_main(req, res, next) {
     try {
+        //추천 친구 추후에
+        //
+        let currentPage = req.query.page;
+        const pageSize = 3;
+        const page = paging(currentPage, pageSize);
+
+        const parameter = {
+            offset: page.offset,
+            limit: page.limit
+        }
+
+        const real_time_upload_post = await accompanyDAO.read_upload_post(parameter);
+        const closing_post = await accompanyDAO.read_closing_post(parameter);
+
+        const real_time_data = real_time_upload_post;
+        const closing_data = closing_post;
 
         res.json({
-            "db_data": db_data
+            "real_time_data": real_time_data,
+            "closing_data": closing_data
         })
     } catch (err) {
         res.send("메인 페이지 오류")
@@ -34,14 +62,29 @@ async function companionPost_create(req, res, next) {
             let tagg = tag[i];
             const tag_parameter = { post_key, tagg };
             const tag_data = await accompanyDAO.insert_tag(tag_parameter);
-        }
-
-        const chat_parameter = { post_key, user_key, title }
-        const chat_db_data = await chatDAO.chat_listC_host(chat_parameter);
+        };
 
         res.send("success");
     } catch (err) {
+        console.log(err)
         res.send("게시글 업로드 오류");
+    }
+}
+
+async function host_accompany_chat(req, res, next) {
+    try {
+        const post_key = req.params.post_key;
+        const user_key = req.params.user_key;
+
+        const accompany_data = await accompanyDAO.accompany_info(post_key);
+        const insert_accompany_data = await chatDAO.chat_listC_host(accompany_data[0]);
+        
+        let db_data = await chatDAO.chat_list_info(post_key);
+        db_data = db_data[0];
+
+        res.render("socket_test", { db_data, user_key });
+    } catch (err) {
+        res.send("작성자 채팅방 생성 오류");
     }
 }
 
@@ -100,24 +143,17 @@ async function companionPost_delete(req, res, next) {
 async function companionPost_read(req, res, next) {
     try {
         const post_key = req.params.post_key;
+        const user_key = await accompanyDAO.companion_postD_check_identity(post_key);
         const db_data = await accompanyDAO.companion_postR(post_key);
+
         res.json({
-            "db_data": db_data
+            "db_data": db_data,
+            "user_key": user_key,
+            "post_key": post_key
         });
     } catch (err) {
         res.send("읽어올 수 없습니다.");
     }
-}
-
-const paging = (currentPage, pageSize) => {
-    const default_start_page = 0;
-    const page_size = pageSize;
-    if (currentPage < 0 || !currentPage) currentPage = default_start_page;
-    let result = {
-        offset: (currentPage) * page_size,
-        limit: Number(page_size)
-    }
-    return result;
 }
 
 async function companionPost_read_A(req, res, next) {
@@ -145,7 +181,6 @@ async function profile_detail(req, res, next) {
         const user_key = req.params.user_key;
         //방명록에서 사진도 불러와야 함(나경이 코드?)
         //user DB에 레벨, 훈장, 고도 추가해야함?
-        //추후에 지도도 불러와야함
         const db_data = await accompanyDAO.companion_detail(user_key);
         res.json({
             "db_data": db_data
@@ -262,6 +297,7 @@ async function companionPost_createChat(req, res, next) {
 module.exports = {
     accompany_main,
     companionPost_create,
+    host_accompany_chat,
     companionPost_update,
     companionPost_delete,
     companionPost_read,

@@ -2,6 +2,7 @@
 
 const friendDAO = require("../model/friendDAO");
 const chatDAO = require("../model/chatDAO");
+const alarmDAO = require("../model/alarmDAO");
 
 //친구 요청 post
 async function req_friend(req, res, next) {
@@ -9,10 +10,23 @@ async function req_friend(req, res, next) {
         const req_person = req.body.req_person;
         const res_person = req.body.res_person;
 
-        const parameter = { req_person, res_person };
+        let parameter = { req_person, res_person };
 
         console.log("req_person: " + req_person + ", res_person: " + res_person);
-        const db_data = await friendDAO.req_friend(parameter);
+        let db_data = await friendDAO.req_friend(parameter);
+
+        let data;
+        let img;
+
+        const friend_req_data = await alarmDAO.friend_req_alarm(req_person);
+        data = friend_req_data[0].nickname;
+        img = friend_req_data[0].img;
+
+        const alarm_data = await alarmDAO.alarm_content(1);
+        data = data + " " + alarm_data[0].msg;
+
+        parameter = { req_person, res_person, data };
+        db_data = await alarmDAO.friend_req_save(parameter);
 
         res.send("success");
     } catch (err) {
@@ -26,14 +40,30 @@ async function res_friend(req, res, next) {
         const user_key = req.body.user_key;
         const del_friend = req.body.del_friend;
         const answer = req.body.answer;
+        let data;
+        let img;
 
         const parameter = { user_key, del_friend };
 
         if (answer == "수락") {
             const db_data_1 = await friendDAO.res_friend_accept(parameter);
             const db_data_2 = await friendDAO.res_friend_accept_add(parameter);
+            
+            const friend_res_data = await alarmDAO.friend_res_alarm(user_key);
+            data = friend_res_data[0].nickname;
+            img = friend_res_data[0].img;
+
+            const alarm_data = await alarmDAO.alarm_content(2);
+            data = data + " " + alarm_data[0].msg;
+
+            console.log(data);
+
+            const parameter = { user_key, del_friend, data };
+            const db_data = await alarmDAO.friend_res_save(parameter);
+
             res.send("success");
         }
+
         if (answer == "거절") {
             const db_data_3 = await friendDAO.remove_firend(parameter);
             res.send("success");

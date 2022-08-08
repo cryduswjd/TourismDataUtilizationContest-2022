@@ -4,7 +4,7 @@ const express = require("express");
 const router = express.Router();
 const accompany_ctrl = require("../controller/accompany_ctrl");
 
-//동행 메인x
+//동행 메인o (추천 시스템 추가 x)
 router.get('/accompany_main', accompany_ctrl.accompany_main);
 //동행 게시글 쓰기o
 router.post('/companionPostC', accompany_ctrl.companionPost_create);
@@ -18,6 +18,8 @@ router.get('/companionPostR/:post_key', accompany_ctrl.companionPost_read);
 router.get('/companionPostR_A', accompany_ctrl.companionPost_read_A);
 
 
+//호스트가 게시글을 올리자마자 채팅방 입장
+router.get('/host_accompany_chat/:post_key/:user_key', accompany_ctrl.host_accompany_chat);
 //동행자 디테일 x
 router.get('/companion_detail/:user_key', accompany_ctrl.profile_detail);
 //동행 게시글 검색_아이디o

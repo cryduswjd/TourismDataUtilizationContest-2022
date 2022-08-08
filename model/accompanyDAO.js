@@ -14,6 +14,18 @@ function companion_postC(parameter) {
     });
 }
 
+function accompany_info(parameter) {
+    return new Promise((resolve, reject) => {
+        console.log("db start p")
+        const queryData = `SELECT user_key, post_key, title, personnel FROM accompany where post_key = ?`;
+        db.query(queryData, [parameter], (err, db_data) => {
+            console.log(db_data);
+            if (db_data) resolve(db_data);
+            else reject(err);
+        })
+    })
+}
+
 function insert_tag(parameter) {
     return new Promise((resolve, reject) => {
         console.log("db start p")
@@ -86,9 +98,33 @@ function companion_postD(parameter) {
     });
 }
 
+function read_upload_post(parameter) {
+    return new Promise((resolve, reject) => {
+        console.log("db start p")
+        const queryData = `SELECT accompany.user_key, nickname, img, title FROM accompany LEFT OUTER JOIN user ON accompany.user_key = user.user_key ORDER BY date_update DESC LIMIT ?, ?`;
+        db.query(queryData, [parameter.offset, parameter.limit], (err, db_data) => {
+            console.log(db_data);
+            if(db_data) resolve(db_data);
+            else reject(err);
+        })
+    })
+}
+
+function read_closing_post(parameter) {
+    return new Promise((resolve, reject) => {
+        console.log("db start p")
+        const queryData = `SELECT accompany.user_key, nickname, img, title FROM accompany LEFT OUTER JOIN user ON accompany.user_key = user.user_key ORDER BY date_update ASC LIMIT ?, ?`;
+        db.query(queryData, [parameter.offset, parameter.limit], (err, db_data) => {
+            console.log(db_data);
+            if(db_data) resolve(db_data);
+            else reject(err);
+        })
+    })
+}
+
 function companion_postR(parameter) {
     return new Promise((resolve, reject) => {
-        const queryData = `SELECT nickname, title, des, personnel, tag, date_upload, date_update FROM accompany LEFT OUTER JOIN user ON accompany.user_key = user.user_key Where post_key = ?`;
+        const queryData = `SELECT nickname, img, title, des, personnel, tag, date_upload, date_update FROM accompany LEFT OUTER JOIN user ON accompany.user_key = user.user_key Where post_key = ?`;
         db.query(queryData, [parameter], (err, db_data) => {
             console.log(db_data);
             if(db_data) resolve(db_data);
@@ -99,7 +135,7 @@ function companion_postR(parameter) {
 
 function companion_postR_A(parameter) {
     return new Promise((resolve, reject) => {
-        const queryData = `SELECT nickname, title, des, personnel, date_update FROM accompany LEFT OUTER JOIN user ON accompany.user_key = user.user_key LIMIT ?, ?`;
+        const queryData = `SELECT accompany.user_key, post_key, nickname, img, title, des, personnel, date_update FROM accompany LEFT OUTER JOIN user ON accompany.user_key = user.user_key LIMIT ?, ?`;
         db.query(queryData, [parameter.offset, parameter.limit], (err, db_data) => {
             console.log(db_data);
             if(db_data) resolve(db_data);
@@ -122,7 +158,7 @@ function companion_detail(parameter) {
 function companion_search_user(parameter) {
     return new Promise((resolve, reject) => {
         console.log("db start p")
-        const queryData = `SELECT nickname FROM user where nickname LIKE ? LIMIT ?, ?`;
+        const queryData = `SELECT user_key, nickname, img FROM user where nickname LIKE ? LIMIT ?, ?`;
         db.query(queryData, [`%${parameter.search_user}%`, parameter.offset, parameter.limit], (err, db_data) => {
             console.log(db_data);
             if(db_data) resolve(db_data);
@@ -134,7 +170,7 @@ function companion_search_user(parameter) {
 function companion_search_area(parameter) {
     return new Promise((resolve, reject) => {
         console.log("db start p")
-        const queryData = `SELECT nickname, title, des, personnel, date_update FROM accompany 
+        const queryData = `SELECT accompany.user_key, nickname, img, title, des, personnel, date_update FROM accompany 
                         LEFT OUTER JOIN user ON accompany.user_key = user.user_key where title LIKE ? LIMIT ?, ?`;
         db.query(queryData, [`%${parameter.search_area}%`, parameter.offset, parameter.limit], (err, db_data) => {
             console.log(db_data);
@@ -184,12 +220,15 @@ function check_close_personnel(parameter) {
 
 module.exports = {  
     companion_postC,
+    accompany_info,
     insert_tag,
     companion_postU,
     delete_tag,
     companion_postD_check_identity,
     companion_postD_check_admin,
     companion_postD,
+    read_upload_post,
+    read_closing_post,
     companion_postR,
     companion_postR_A,
     companion_detail,

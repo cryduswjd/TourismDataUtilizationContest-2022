@@ -71,6 +71,10 @@
         </div>
       </div>
     </div>
+
+    <div>
+      <button id="exit-room-button" class="btn btn-success" placeholder="message">exit</button>
+    </div>
     
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
@@ -82,11 +86,10 @@
         const user_key = "<%= user_key %>";
         const room_key = "<%= db_data.room_key %>";
         const post_key = "<%= db_data.post_key %>";
-        console.log('post_key: ', post_key, '/ user_key: ', user_key);
+        console.log('post_key: ', post_key, '/ user_key: ', user_key, 'room_key: ', room_key);
         const title = "<%= db_data.title %>";
         const type = "<%= db_data.type %>";
         
-        // 클라이언트에서 reuqest_message 프로토콜로 id='m' 의 input 값을 보낸다.
         $('#msg-send').click(() => {
           socket.emit('request_message', $('#m').val());
           $('#m').val('');
@@ -108,6 +111,15 @@
           return false;
         });
 
+        $('#exit-room-button').click(() => {
+          console.log('exit:\n', 'room_key: ', room_key, 'user_key: ', user_key)
+          socket.emit('exit_room', { room_key, user_key });
+        });
+
+        socket.on('noti_exit_room', (res) => {
+          $('#room-messages').prepend($('<li>').text(res));
+        });
+
         socket.on('response_message', (res) => {
           $('#messages').prepend($('<li>').text(res));
         });
@@ -119,8 +131,6 @@
         socket.on('noti_room_message', (res) => {
           $('#room-messages').prepend($('<li>').text(res.msg));
         });
-
-        
       });
     </script>
   </body>

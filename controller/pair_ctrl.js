@@ -93,7 +93,7 @@ async function photo_share(req, res, next) {
 
         //post_key와 user_key를 사용하여 mate_key 불러오기
         let parameter = { post_key, user_key };
-        let mate_key = await pairDAO.load_mate_key(parameter);
+        let mate_key = await pairDAO.load_mate_key_forUser(parameter);
         mate_key = mate_key[0].mate_key;
 
         parameter = { mate_key, user_key, string };
@@ -101,6 +101,7 @@ async function photo_share(req, res, next) {
 
         res.send('success');
     } catch (err) {
+        console.log(err)
         res.send('사진 공유 오류')
     }
 }
@@ -177,7 +178,7 @@ async function todo_list(req, res, next) {
         const todo = req.body.todo;
 
         let parameter = { post_key, user_key };
-        let mate_key = await pairDAO.load_mate_key(parameter);
+        let mate_key = await pairDAO.load_mate_key_forUser(parameter);
         mate_key = mate_key[0].mate_key;
 
         parameter = { mate_key, user_key, todo };

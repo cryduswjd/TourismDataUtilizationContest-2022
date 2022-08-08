@@ -8,7 +8,7 @@ const friendRouter = require("./routes/friendRouter");
 const chatRouter = require("./routes/chatRouter");
 const accompanyRouter = require("./routes/accompanyRouter");
 const pairRouter = require("./routes/pairRouter");
-const traceRouter = require("./routes/traceRouter");
+const alarmRouter = require("./routes/alarmRouter");
 
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
@@ -20,6 +20,6 @@ app.use("/friend", friendRouter);
 app.use("/chat", chatRouter);
 app.use("/accompany", accompanyRouter);
 app.use("/pair", pairRouter);
-app.use("/trace", traceRouter);
+app.use("/alarm", alarmRouter);
 
 module.exports = app;
