@@ -13,4 +13,4 @@ const dbOption = {
 
 const db = mysql.createConnection(dbOption);
 
-module.exports = db;    
+module.exports = {db};    

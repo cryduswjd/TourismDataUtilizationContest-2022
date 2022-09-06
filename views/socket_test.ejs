@@ -76,6 +76,10 @@
       <button id="exit-room-button" class="btn btn-success" placeholder="message">exit</button>
     </div>
     
+    <div>
+      <button id="export-room-button" class="btn btn-success" placeholder="message">export</button>
+    </div>
+
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
     <script>
@@ -116,8 +120,8 @@
           socket.emit('exit_room', { room_key, user_key });
         });
 
-        socket.on('noti_exit_room', (res) => {
-          $('#room-messages').prepend($('<li>').text(res));
+        $('#export-room-button').click(() => {
+          socket.emit('export_room', { room_key, user_key });
         });
 
         socket.on('response_message', (res) => {
@@ -130,6 +134,14 @@
 
         socket.on('noti_room_message', (res) => {
           $('#room-messages').prepend($('<li>').text(res.msg));
+        });
+
+        socket.on('noti_exit_room', (res) => {
+          $('#room-messages').prepend($('<li>').text(res));
+        });
+
+        socket.on('noti_export_room', (res) => {
+          $('#room-messages').prepend($('<li>').text(res));
         });
       });
     </script>

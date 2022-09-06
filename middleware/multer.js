@@ -13,7 +13,7 @@ const testUpload = multer.diskStorage({
 
 const uploadAction = multer({ 
     storage: testUpload
-});
+})
 
 module.exports = {
     uploadAction

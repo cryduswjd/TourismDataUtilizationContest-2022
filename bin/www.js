@@ -11,7 +11,7 @@ app.use(session({
     resave: false,
     saveUninitialized: true,
     store: new FileStore()
-}));
+}))
 
 const server = http.createServer(app);
 const socketio = require('../middleware/socketio');

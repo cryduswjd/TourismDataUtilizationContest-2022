@@ -1,11 +1,13 @@
 "use strict"
 
 const pairDAO = require("../model/pairDAO");
+const decoDAO = require("../model/decoDAO");
+const alarmDAO = require("../model/alarmDAO");
 
 //큐알에 쓰이는 정보 보내주기 - 사용자버전
 async function qr_info(req, res, next) {
     try {
-        const user_key = req.params.user_key;
+        const user_key = (req.get('user_key') != "" && req.get('user_key') != undefined) ? req.get('user_key') : null;
         const db_data = await pairDAO.load_user_id(user_key);
 
         res.json({
@@ -37,7 +39,7 @@ async function qr_check(req, res, next) {
         //user_key, post_key에 해당하는 데이터의 connect = 1로 update
         const db_data = await pairDAO.user_connect(parameter);
 
-        res.send('success');
+        res.send({ result: "success" });
     } catch (err) {
         res.send('OR 인증 오류')
     }
@@ -47,14 +49,14 @@ async function qr_check(req, res, next) {
 async function user_disable(req, res, next) {
     try {
         const mate_key = req.params.mate_key;
-        const user_key = req.params.user_key;
+        const user_key = (req.get('user_key') != "" && req.get('user_key') != undefined) ? req.get('user_key') : null;
         
         const parameter = { mate_key, user_key };
         let db_data = await pairDAO.user_connect_zero(parameter);
         //pairDB에서도 권한을 0으로 바꿔 모든 기능 stop
         db_data = await pairDAO.pair_auth_stop(parameter);
 
-        res.send('success');
+        res.send({ result: "success" });
     } catch (err) {
         res.send('사용자 비활성화 실패')
     }
@@ -64,14 +66,14 @@ async function user_disable(req, res, next) {
 async function user_restart(req, res, next) {
     try {
         const mate_key = req.params.mate_key;
-        const user_key = req.params.user_key;
+        const user_key = (req.get('user_key') != "" && req.get('user_key') != undefined) ? req.get('user_key') : null;
 
         const parameter = { mate_key, user_key };
         let db_data = await pairDAO.user_connect_one(parameter);
         //pairDB에서도 권한을 1로 바꿔 모든 기능 실행
         db_data = await pairDAO.pair_auth_start(parameter);
 
-        res.send('success');
+        res.send({ result: "success" });
     } catch (err) {
         res.send('사용자 활성화 실패')
     }
@@ -81,7 +83,7 @@ async function user_restart(req, res, next) {
 async function photo_share(req, res, next) {
     try {
         const post_key = req.params.post_key;
-        const user_key = req.params.user_key;
+        const user_key = (req.get('user_key') != "" && req.get('user_key') != undefined) ? req.get('user_key') : null;
         const photo = req.files;
 
         //사진 한번에 받아서 DB에 한 줄씩 넣기
@@ -99,7 +101,33 @@ async function photo_share(req, res, next) {
         parameter = { mate_key, user_key, string };
         const db_data = await pairDAO.save_photo(parameter);
 
-        res.send('success');
+        //첫 사진 공유 시 훈장 지급
+        const cnt = await pairDAO.count_share(user_key);
+        console.log(cnt)
+
+        if( cnt[0].user_key_cnt==1 ) {
+            let send_deco = await decoDAO.send_deco(14); 
+            let deco_data = send_deco[0];
+
+            let alarm_data = await alarmDAO.alarm_content(4);
+            alarm_data = alarm_data[0].msg;
+
+            const msg = deco_data.content + " " + alarm_data;
+
+            let parameter = { user_key, msg, post_key };
+            const insert_alarm_data = await alarmDAO.deco_save(parameter);
+
+            parameter = { user_key, deco_key: 14 };
+            const db_daco = await decoDAO.insert_deco(parameter);
+
+            const alarm_key = insert_alarm_data.insertId;
+
+            res.send({ result: post_key, deco_data, alarm_data, alarm_key });
+        }
+
+        else {
+            res.send({ result: "success" });
+        }
     } catch (err) {
         console.log(err)
         res.send('사진 공유 오류')
@@ -146,7 +174,7 @@ async function show_photo(req, res, next) {
 async function show_all_photo(req, res, next){
     try{
         const mate_key = req.params.mate_key;
-        const user_key = req.params.user_key;
+        const user_key = (req.get('user_key') != "" && req.get('user_key') != undefined) ? req.get('user_key') : null;
 
         let currentPage = req.query.page;
         const pageSize = 15;
@@ -174,7 +202,7 @@ async function show_all_photo(req, res, next){
 async function todo_list(req, res, next) {
     try{
         const post_key = req.params.post_key;
-        const user_key = req.params.user_key;
+        const user_key = (req.get('user_key') != "" && req.get('user_key') != undefined) ? req.get('user_key') : null;
         const todo = req.body.todo;
 
         let parameter = { post_key, user_key };
@@ -184,7 +212,7 @@ async function todo_list(req, res, next) {
         parameter = { mate_key, user_key, todo };
         const db_data = await pairDAO.save_todo(parameter);
 
-        res.send('success');
+        res.send({ result: "success" });
     } catch (err) {
         res.send('여행 계획 추가 오류')
     }
@@ -208,7 +236,7 @@ async function show_todo_list(req, res, next) {
 async function rating_user_info(req, res, next) {
     try{
         const post_key = req.params.post_key;
-        const user_key = req.params.user_key;
+        const user_key = (req.get('user_key') != "" && req.get('user_key') != undefined) ? req.get('user_key') : null;
 
         const parameter = { post_key, user_key };
         const db_data = await pairDAO.user_profile_info(parameter);
@@ -228,8 +256,17 @@ async function pair_rate(req, res, next) {
         const user_keys = req.body.user_keys;
         const ratings = req.body.ratings;
 
-        const user_key_ = user_keys.split(', ');
-        const rating = ratings.split(', ');
+        let user_key_;  let rating;
+
+        if (user_keys.length >= 2) {
+            user_key_ = user_keys.split(', ');
+            rating = ratings.split(', ');
+        }
+
+        else {
+            user_key_ = user_keys;
+            rating = ratings;
+        }
 
         const user_len = user_key_.length;
 
@@ -237,6 +274,7 @@ async function pair_rate(req, res, next) {
             let user_key = user_key_[i];
             let rate = rating[i];
             let parameter = { post_key, user_key };
+            console.log(parameter)
 
             let mate_key = await pairDAO.load_mate_key_forUser(parameter);
             mate_key = mate_key[0].mate_key;
@@ -245,9 +283,10 @@ async function pair_rate(req, res, next) {
             console.log(parameter)
 
             let db_data = await pairDAO.user_rating(parameter);
-        };
-        res.send('success');    
+        };  
+        res.send({ result: "success" });
     } catch (err) {
+        console.log(err)
         res.send('평가 오류')
     }
 }
@@ -267,7 +306,7 @@ async function disconnect_pair(req, res, next) {
             const type_zero = await pairDAO.type_zero(user_key);
         }    
 
-        res.send('success');
+        res.send({ result: 1 });
     } catch (err) {
         res.send('연결 끊기 오류');
     }

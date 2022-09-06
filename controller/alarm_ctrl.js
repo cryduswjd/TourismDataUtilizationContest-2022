@@ -4,7 +4,7 @@ const alarmDAO = require("../model/alarmDAO");
 
 async function alarm_main(req, res, next) {
     try {
-        const user_key = req.params.user_key;
+        const user_key = (req.get('user_key') != "" && req.get('user_key') != undefined) ? req.get('user_key') : null;
         const db_data = await alarmDAO.alarm_main_page(user_key);
 
         res.json({
@@ -15,22 +15,22 @@ async function alarm_main(req, res, next) {
     }
 }
 
-async function send_alarm(req, res, next) {
+async function check_alarm(req, res, next) {
     try {
-        const user_key = req.params.user_key;
-        const type = req.params.type;
-        const parameter = { user_key, type };
+        const alarm_key = req.params.alarm_key;
 
-        const db_data = await alarmDAO.alarm_type(parameter);
+        const db_data = await alarmDAO.check_read(alarm_key);
+        const result = await alarmDAO.post_move(alarm_key);
+
         res.json({
-            "db_data": db_data
+            "result": result
         })
     } catch (err) {
-        res.send("알림 정보 불러오기 오류");
+        res.send("알림 확인 오류");
     }
 }
 
 module.exports = {
     alarm_main,
-    send_alarm
+    check_alarm
 }
