@@ -64,7 +64,6 @@ async function res_friend(req, res, next) {
         const del_friend = req.body.del_friend;
         const answer = req.body.answer;
         let data;
-        let img;
 
         const parameter = { user_key, del_friend };
 
