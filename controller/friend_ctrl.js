@@ -169,7 +169,7 @@ async function chat_friend(req, res, next) {
         let db_data = await chatDAO.chat_listR_socket(user_key);
         db_data = db_data[0];
 
-        res.send(db_data, user_key);
+        res.send({ db_data, user_key });
     } catch (err) {
         res.send("통신 오류");
     }

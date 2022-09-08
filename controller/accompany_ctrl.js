@@ -460,7 +460,7 @@ async function companionPost_Deadline_Btn(req, res, next) {
 
                 const msg = deco_data[i] + " " + alarm_data[i];
 
-                const parameter = { user_key, msg };
+                let parameter = { user_key, msg };
                 const insert_alarm_data = await alarmDAO.deco_save(parameter);
             
                 parameter = { user_key, deco_key: 11 };
@@ -482,7 +482,7 @@ async function companionPost_Deadline_Btn(req, res, next) {
 
                 const msg = deco_data[i] + " " + alarm_data[i];
 
-                const parameter = { user_key, msg };
+                let parameter = { user_key, msg };
                 const insert_alarm_data = await alarmDAO.deco_save(parameter);
             
                 parameter = { user_key, deco_key: 12 };
@@ -513,7 +513,7 @@ async function companionPost_createChat(req, res, next) {
         const check_pair = await pairDAO.check_other_pair(user_key);
 
         if(check_pair[0].cnt == 0) {
-            res.send(db_data, user_key);
+            res.send({ db_data, user_key });
         }
         else {
             res.send({ result: "이미 짝궁이 되어있습니다." });

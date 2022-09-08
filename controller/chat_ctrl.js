@@ -28,7 +28,7 @@ async function chat_read(req, res, next) {
         let pre_data = await chatDAO.chat_read_each(room_key);
         pre_data = pre_data[0];
 
-        res.send(pre_data, db_data, user_key);
+        res.send({ pre_data, db_data, user_key });
     } catch (err) {
         res.send("채팅을 불러올 수 없습니다.");
     }
