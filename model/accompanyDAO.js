@@ -133,7 +133,7 @@ function read_upload_post(parameter) {
         FROM accompany
         LEFT OUTER JOIN user ON accompany.user_key = user.user_key
         where accept = true AND deadline = 0
-        ORDER BY date_update DESC LIMIT ?, ?`;
+        ORDER BY date_upload DESC LIMIT ?, ?`;
         db.query(queryData, [parameter.offset, parameter.limit], (err, db_data) => {
             if(db_data) resolve(db_data);
             else reject(err);
@@ -148,7 +148,7 @@ function read_closing_post(parameter) {
         FROM accompany
         LEFT OUTER JOIN user ON accompany.user_key = user.user_key
         where accept = true AND deadline = 0
-        ORDER BY date_update ASC LIMIT ?, ?`;
+        ORDER BY date_upload ASC LIMIT ?, ?`;
         db.query(queryData, [parameter.offset, parameter.limit], (err, db_data) => {
             if(db_data) resolve(db_data);
             else reject(err);
