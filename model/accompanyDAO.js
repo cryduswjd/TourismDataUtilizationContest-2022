@@ -44,7 +44,6 @@ function profile_tag(parameter) {
 
 function companion_postC(parameter) {
     return new Promise((resolve, reject) => {
-        console.log("db start p")
         const queryData = `INSERT INTO accompany(user_key, title, des, personnel, tag) values (?, ?, ?, ?, ?)`;
         db.query(queryData, [parameter.user_key, parameter.title, parameter.des, parameter.personnel, parameter.tags], (err, db_data) => {
             console.log(db_data);
@@ -56,7 +55,6 @@ function companion_postC(parameter) {
 
 function accompany_info(parameter) {
     return new Promise((resolve, reject) => {
-        console.log("db start p")
         const queryData = `SELECT user_key, post_key, title, personnel FROM accompany where post_key = ?`;
         db.query(queryData, [parameter], (err, db_data) => {
             console.log(db_data);
@@ -68,7 +66,6 @@ function accompany_info(parameter) {
 
 function insert_tag(parameter) {
     return new Promise((resolve, reject) => {
-        console.log("db start p")
         const queryData = `INSERT INTO tag (post_key, tag_name) values (?, ?)`;
         db.query(queryData, [parameter.post_key, parameter.tagg], (err, db_data) => {
             console.log(db_data);
@@ -80,7 +77,6 @@ function insert_tag(parameter) {
 
 function companion_postU(parameter) {
     return new Promise((resolve, reject) => {
-        console.log("db start p")
         const queryData = `UPDATE accompany SET user_key = ?, title = ?, des = ?, personnel = ?, tag = ? where post_key = ?`;
         db.query(queryData, [parameter.user_key, parameter.title, parameter.des, parameter.personnel, parameter.tags, parameter.post_key], (err, db_data) => {
             console.log(db_data);
@@ -92,10 +88,8 @@ function companion_postU(parameter) {
 
 function delete_tag(parameter) {
     return new Promise((resolve, reject) => {
-        console.log("db start p")
         const queryData = `DELETE FROM tag where post_key = ?`;
         db.query(queryData, [parameter], (err, db_data) => {
-            console.log(db_data);
             if(db_data) resolve(db_data);
             else reject(err);
         })
@@ -104,10 +98,8 @@ function delete_tag(parameter) {
 
 function companion_postD_check_identity(parameter) {
     return new Promise((resolve, reject) => {
-        console.log("db start p")
         const queryData = `SELECT user_key FROM accompany where post_key = ?`;
         db.query(queryData, [parameter], (err, db_data) => {
-            console.log(db_data);
             if(db_data) resolve(db_data);
             else reject(err);
         })
@@ -116,10 +108,8 @@ function companion_postD_check_identity(parameter) {
 
 function companion_postD_check_admin(parameter) {
     return new Promise((resolve, reject) => {
-        console.log("db start p")
         const queryData = `SELECT admin FROM user where user_key = ?`;
         db.query(queryData, [parameter], (err, db_data) => {
-            console.log(db_data);
             if(db_data) resolve(db_data);
             else reject(err);
         })
@@ -128,10 +118,8 @@ function companion_postD_check_admin(parameter) {
 
 function companion_postD(parameter) {
     return new Promise((resolve, reject) => {
-        console.log("db start p")
         const queryData = `DELETE FROM accompany where post_key = ?`;
         db.query(queryData, [parameter], (err, db_data) => {
-            console.log(db_data);
             if(db_data) resolve(db_data);
             else reject(err);
         })
@@ -140,14 +128,13 @@ function companion_postD(parameter) {
 
 function read_upload_post(parameter) {
     return new Promise((resolve, reject) => {
-        console.log("db start p")
         const queryData = `SELECT accompany.user_key, post_key, nickname, img, title, des, accompany.personnel,
         (SELECT personnel FROM chat_list where (accompany.post_key = chat_list.post_key AND chat_list.personnel != 0)) AS count_personnel, date_format(date_update, '%Y-%m-%d %T') as date_update
         FROM accompany
         LEFT OUTER JOIN user ON accompany.user_key = user.user_key
+        where accept = true AND deadline = 0
         ORDER BY date_update DESC LIMIT ?, ?`;
         db.query(queryData, [parameter.offset, parameter.limit], (err, db_data) => {
-            console.log(db_data);
             if(db_data) resolve(db_data);
             else reject(err);
         })
@@ -156,14 +143,13 @@ function read_upload_post(parameter) {
 
 function read_closing_post(parameter) {
     return new Promise((resolve, reject) => {
-        console.log("db start p")
         const queryData = `SELECT accompany.user_key, post_key, nickname, img, title, des, accompany.personnel,
         (SELECT personnel FROM chat_list where (accompany.post_key = chat_list.post_key AND chat_list.personnel != 0)) AS count_personnel, date_format(date_update, '%Y-%m-%d %T') as date_update
         FROM accompany
         LEFT OUTER JOIN user ON accompany.user_key = user.user_key
+        where accept = true AND deadline = 0
         ORDER BY date_update ASC LIMIT ?, ?`;
         db.query(queryData, [parameter.offset, parameter.limit], (err, db_data) => {
-            console.log(db_data);
             if(db_data) resolve(db_data);
             else reject(err);
         })
@@ -174,7 +160,6 @@ function companion_postR(parameter) {
     return new Promise((resolve, reject) => {
         const queryData = `SELECT nickname, img, title, des, personnel, tag, date_format(date_upload, '%Y-%m-%d %T') as date_upload, date_format(date_update, '%Y-%m-%d %T') as date_update FROM accompany LEFT OUTER JOIN user ON accompany.user_key = user.user_key Where post_key = ?`;
         db.query(queryData, [parameter], (err, db_data) => {
-            console.log(db_data);
             if(db_data) resolve(db_data);
             else reject(err);
         })
@@ -233,7 +218,6 @@ function companion_detail(parameter) {
 
 function companion_search_user(parameter) {
     return new Promise((resolve, reject) => {
-        console.log("db start p")
         const queryData = `SELECT user_key, nickname, img FROM user where nickname LIKE ? LIMIT ?, ?`;
         db.query(queryData, [`%${parameter.search_user}%`, parameter.offset, parameter.limit], (err, db_data) => {
             if(db_data) resolve(db_data);
@@ -244,7 +228,6 @@ function companion_search_user(parameter) {
 
 function companion_search_area(parameter) {
     return new Promise((resolve, reject) => {
-        console.log("db start p")
         const queryData = `SELECT accompany.user_key, nickname, img, title, des, personnel, date_format(date_update, '%Y-%m-%d %T') as date_update FROM accompany 
                         LEFT OUTER JOIN user ON accompany.user_key = user.user_key where title LIKE ? LIMIT ?, ?`;
         db.query(queryData, [`%${parameter.search_area}%`, parameter.offset, parameter.limit], (err, db_data) => {
@@ -256,7 +239,6 @@ function companion_search_area(parameter) {
 
 function check_deadline(parameter) {
     return new Promise((resolve, reject) => {
-        console.log("db start p")
         const queryData = `UPDATE accompany SET deadline = 1 where post_key = ? AND user_key = ?`;
         db.query(queryData, [parameter.post_key, parameter.host], (err, db_data) => {
             if(err) reject(err);
@@ -267,7 +249,6 @@ function check_deadline(parameter) {
 
 function check_personnel(parameter) {
     return new Promise((resolve, reject) => {
-        console.log("db start p")
         const queryData = `SELECT personnel FROM accompany where post_key = ?`;
         db.query(queryData, [parameter], (err, db_data) => {
             if(db_data) resolve(db_data);
@@ -278,7 +259,6 @@ function check_personnel(parameter) {
 
 function check_close_personnel(parameter) {
     return new Promise((resolve, reject) => {
-        console.log("db start p")
         const queryData = `SELECT chat_list.personnel FROM chat_list 
                            LEFT OUTER JOIN accompany ON chat_list.user_key = accompany.user_key
                            where accompany.post_key = ?`;

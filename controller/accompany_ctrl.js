@@ -130,11 +130,11 @@ async function companionPost_create(req, res, next) {
             .send(message)
             .then(function (response) {
                 console.log('Successfully sent message: ', response)
-                return res.json({ user_key, post_key, deco_data, alarm_data, alarm_key })
+                return res.json({ user_key, post_key })
             })
             .catch(function (err) {
                 console.log('Error Sending message: ', err)
-                return res.json({ result : "false" })
+                return res.json({ result : false })
             });
         }
 
@@ -168,11 +168,11 @@ async function companionPost_create(req, res, next) {
             .send(message)
             .then(function (response) {
                 console.log('Successfully sent message: ', response)
-                return res.json({ user_key, post_key, deco_data, alarm_data, alarm_key })
+                return res.json({ user_key, post_key })
             })
             .catch(function (err) {
                 console.log('Error Sending message: ', err)
-                return res.json({ result : "false" })
+                return res.json({ result : false })
             });
         }
 
@@ -206,11 +206,11 @@ async function companionPost_create(req, res, next) {
             .send(message)
             .then(function (response) {
                 console.log('Successfully sent message: ', response)
-                return res.json({ user_key, post_key, deco_data, alarm_data, alarm_key })
+                return res.json({ user_key, post_key })
             })
             .catch(function (err) {
                 console.log('Error Sending message: ', err)
-                return res.json({ result : "false" })
+                return res.json({ result : false })
             });
         }
         else {
@@ -508,15 +508,17 @@ async function companionPost_createChat(req, res, next) {
         //room_key, post_key, title, type
         let db_data = await chatDAO.chat_list_key(post_key);
         db_data = db_data[0];
+        console.log("db_data_1: ", db_data)
 
         //다른 사람과 짝궁이 되어있는 상태인지 확인
         const check_pair = await pairDAO.check_other_pair(user_key);
+        console.log("check_pair: ", check_pair)
 
         if(check_pair[0].cnt == 0) {
-            res.send({ db_data, user_key });
+            res.send({ db_data, user_key, result: "짝궁 가능" });
         }
         else {
-            res.send({ result: "이미 짝궁이 되어있습니다." });
+            res.send({ db_data, user_key, result: "짝궁 불가" });
         }
     } catch (err) {
         res.send("통신 오류");

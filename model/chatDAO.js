@@ -4,7 +4,6 @@ const {db} = require("../config/dbconn");
 //채팅방 리스트
 function chat_listR(parameter) {
     return new Promise((resolve, reject) => {
-        console.log("db start p")
         const queryData = `SELECT room_key, chat_list.title, nickname, img FROM chat_list 
                            LEFT OUTER JOIN user on chat_list.user_key = user.user_key 
                            LEFT OUTER JOIN accompany on chat_list.post_key = accompany.post_key
@@ -20,7 +19,6 @@ function chat_listR(parameter) {
 //채팅방
 function chat_read_each(parameter) {
     return new Promise((resolve, reject) => {
-        console.log("db start p")
         const queryData = `SELECT user_key, nickname, msg, date FROM chating 
         LEFT OUTER JOIN user on chating.user_key = user.user_key
         where room_key = ?`;
@@ -34,7 +32,6 @@ function chat_read_each(parameter) {
 //친구 채팅방 소켓으로 넘겨줄 때 필요한 값 받아오기
 function chat_listR_socket(parameter) {
     return new Promise((resolve, reject) => {
-        console.log("db start p")
         const queryData = `SELECT room_key, title, type FROM chat_list where type = 2 AND user_key = ?`;
         db.query(queryData, [parameter], (err, db_data) => {
             if(db_data) resolve(db_data);
@@ -46,7 +43,6 @@ function chat_listR_socket(parameter) {
 //동행 게시글 post_key로 채팅 리스트의 room_key 가져오기
 function chat_list_key(parameter) {
     return new Promise((resolve, reject) => {
-        console.log("db start p")
         const queryData = `SELECT DISTINCT room_key, post_key, title, type FROM chat_list where post_key = ?`;
         db.query(queryData, [parameter], (err, db_data) => {
             if(db_data) resolve(db_data);
@@ -58,7 +54,6 @@ function chat_list_key(parameter) {
 //동행 참여인원 +
 function plus_personnel(parameter) {
     return new Promise((resolve, reject) => {
-        console.log("db start p")
         const queryData = `UPDATE chat_list SET personnel = personnel + 1 where room_key = ?`;
         db.query(queryData, [parameter], (err, db_data) => {
             if(err) reject(err);
@@ -70,7 +65,6 @@ function plus_personnel(parameter) {
 //동행 참여인원 -
 function minus_personnel(parameter) {
     return new Promise((resolve, reject) => {
-        console.log("db start p")
         const queryData = `UPDATE chat_list SET personnel = personnel - 1 where room_key = ?`;
         db.query(queryData, [parameter], (err, db_data) => {
             if(err) reject(err);
@@ -82,7 +76,6 @@ function minus_personnel(parameter) {
 //동행 채팅방 리스트
 function chat_list_accompanyC(parameter) {
     return new Promise((resolve, reject) => {
-        console.log("db start p")
         const queryData = `INSERT INTO chat_list(room_key, user_key, post_key, title, type) values (?, ?, ?, ?, 1)`;
         db.query(queryData, [parameter.room_key, parameter.user_key, parameter.post_key, parameter.title], (err, db_data) => {
             if(err) reject(err);
@@ -94,7 +87,6 @@ function chat_list_accompanyC(parameter) {
 //동행 채팅방 리스트(host)
 function chat_listC_host(parameter) {
     return new Promise((resolve, reject) => {
-        console.log("db start p")
         const queryData = `INSERT INTO chat_list(user_key, post_key, title, type, personnel) values (?, ?, ?, 1, 0)`;
         db.query(queryData, [parameter.user_key, parameter.post_key, parameter.title], (err, db_data) => {
             if(err) reject(err);
@@ -117,7 +109,6 @@ function chat_list_info(parameter) {
 //채팅방 내 메시지 DB 삽입
 function chat_companion(parameter) {
     return new Promise((resolve, reject) => {
-        console.log("db start p")
         const queryData = `INSERT INTO chating(user_key, room_key, msg) values (?, ?, ?)`;
         db.query(queryData, [parameter.user_key, parameter.room_key, parameter.msg], (err, db_data) => {
             if(err) reject(err);
@@ -128,7 +119,6 @@ function chat_companion(parameter) {
 
 function chat_companion_R(parameter) {
     return new Promise((resolve, reject) => {
-        console.log("db start p")
         const queryData = `SELECT * FROM chating where chat_key = ?`;
         db.query(queryData, [parameter], (err, db_data) => {
             if(db_data) resolve(db_data);
@@ -140,7 +130,6 @@ function chat_companion_R(parameter) {
 //type 1: 동행채팅, type2: 친구채팅 
 function chatRoom_companion(parameter) {
     return new Promise((resolve, reject) => {
-        console.log("db start p")
         const queryData = `INSERT INTO chat_list(room_key, user_key, post_key, title, type) values (?, ?, ?, ?, 1)`;
         db.query(queryData, [parameter.room_key, parameter.user_key, parameter.post_key, parameter.title], (err, db_data) => {
             if(err) reject(err);
@@ -152,7 +141,6 @@ function chatRoom_companion(parameter) {
 //친구 채팅방 리스트
 function chat_list_friendC(parameter) {
     return new Promise((resolve, reject) => {
-        console.log("db start p")
         const queryData = `INSERT INTO chat_list(user_key, title, type) values (?, ?, 2)`;
         db.query(queryData, [parameter.user_key, parameter.load_name], (err, db_data) => {
             if(err) reject(err);
@@ -164,7 +152,6 @@ function chat_list_friendC(parameter) {
 //친구 이름 불러오기
 function listC_load_name(parameter) {
     return new Promise((resolve, reject) => {
-        console.log("db start p")
         const queryData = `SELECT nickname FROM user where user_key = ?`;
         db.query(queryData, [parameter], (err, db_data) => {
             if(db_data){
@@ -180,7 +167,6 @@ function listC_load_name(parameter) {
 //type 1: 동행채팅, type2: 친구채팅 
 function chatRoom_friend(parameter) {
     return new Promise((resolve, reject) => {
-        console.log("db start p")
         const queryData = `INSERT INTO chat_list(user_key, post_key, title, type) values (?, ?, ?, 2)`;
         db.query(queryData, [parameter.user_key, parameter.post_key, parameter.title], (err, db_data) => {
             if(err) reject(err);
@@ -192,7 +178,6 @@ function chatRoom_friend(parameter) {
 //채팅 내용 불러오기
 function read_content(paramter) {
     return new Promise((resolve, reject) => {
-        console.log("db start p");
         const queryData = `SELECT chating.user_key, msg, date, type FROM chating LEFT OUTER JOIN chat_list ON chating.room_key = chat_list.room_key where chating.user_key = ?`;
         db.query(queryData, [paramter], (err, db_data) => {
             if(db_data) resolve(db_data);
@@ -204,7 +189,6 @@ function read_content(paramter) {
 //채팅방에 있는 모든 사람 불러오기
 function read_user(parameter) {
     return new Promise((resolve, reject) => {
-        console.log('db start p');
         const queryData = `SELECT user_key FROM chat_list where room_key = ?`;
         db.query(queryData, [parameter], (err, db_data) => {
             if(db_data) resolve(db_data);
@@ -225,7 +209,6 @@ function modify_user_name(parameter) {
 
 function chat_exit(parameter) {
     return new Promise((resolve, reject) => {
-        console.log('db start p');
         const queryData = `DELETE FROM chat_list where room_key = ? AND user_key = ?`;
         db.query(queryData, [parameter.room_key, parameter.user_key], (err, db_data) => {
             if(err) reject(err);
@@ -236,7 +219,6 @@ function chat_exit(parameter) {
 
 function chat_list_room_key(parameter) {
     return new Promise((resolve, reject) => {
-        console.log("db start p")
         const queryData = `SELECT DISTINCT room_key, post_key, title, type FROM chat_list where room_key = ?`;
         db.query(queryData, [parameter], (err, db_data) => {
             if(db_data) resolve(db_data);

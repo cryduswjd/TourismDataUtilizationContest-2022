@@ -4,7 +4,6 @@ const {db} = require("../config/dbconn");
 
 function chating_save(parameter) {
     return new Promise((resolve, reject) => {
-        console.log("db start P");
         const queryData = `INSERT INTO alarm (user_key, sent_key, msg, time, type) values (?, ?, ?, ?, ?)`;
         db.query(queryData, [parameter.user_key, parameter.sent_user, parameter.msg, parameter.time, parameter.type], (err, db_data) => {
             if(err) reject(err);
