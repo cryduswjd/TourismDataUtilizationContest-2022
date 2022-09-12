@@ -19,26 +19,14 @@ module.exports = (server) => {
                 title: msg.title,
                 type: msg.type
             }
-
-            if ( msg.type == 1 ) { 
-                const check_host = await accompanyDAO.companion_postD_check_identity(parameters.post_key);
-                if(parameters.user_key != check_host[0].user_key) {
-                    const join_db_data = await chatDAO.chatRoom_companion(parameters);
-                }
-                const plus_personnel = await chatDAO.plus_personnel(parameters.room_key);
-            }
-            
-            if ( msg.type == 2 ) { 
-                const join_db_data = await chatDAO.chatRoom_friend(parameters);
-            }
             
             console.log('room_key: ', parameters.room_key)
             socket.join(parameters.room_key);
 
-            let nickname = await chatDAO.modify_user_name(parameters.user_key);
-            nickname = nickname[0].nickname;
-            let asd = nickname +'님이 방에 입장하였습니다.';
-            io.to(parameters.room_key).emit('noti_join_room', asd);
+            // let nickname = await chatDAO.modify_user_name(parameters.user_key);
+            // nickname = nickname[0].nickname;
+            // let asd = nickname +'님이 방에 입장하였습니다.';
+            // io.to(parameters.room_key).emit('noti_join_room', asd);
         });
     
         // 채팅방에 채팅 요청

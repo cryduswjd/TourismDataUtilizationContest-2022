@@ -119,7 +119,7 @@ function chat_companion(parameter) {
 
 function chat_companion_R(parameter) {
     return new Promise((resolve, reject) => {
-        const queryData = `SELECT * FROM chating where chat_key = ?`;
+        const queryData = `SELECT chat_key, user_key, msg, date, nickname, img FROM chating LEFT OUTER JOIN user ON chating.user_key = user.user_key where chat_key = ?`;
         db.query(queryData, [parameter], (err, db_data) => {
             if(db_data) resolve(db_data);
             else reject(err);
@@ -167,8 +167,8 @@ function listC_load_name(parameter) {
 //type 1: 동행채팅, type2: 친구채팅 
 function chatRoom_friend(parameter) {
     return new Promise((resolve, reject) => {
-        const queryData = `INSERT INTO chat_list(user_key, post_key, title, type) values (?, ?, ?, 2)`;
-        db.query(queryData, [parameter.user_key, parameter.post_key, parameter.title], (err, db_data) => {
+        const queryData = `INSERT INTO chat_list(user_key, post_key, title, type) values (?, 0, ?, 2)`;
+        db.query(queryData, [parameter.user_key, parameter.title], (err, db_data) => {
             if(err) reject(err);
             else resolve(db_data);
         })
@@ -198,7 +198,7 @@ function read_user(parameter) {
 }
 
 function modify_user_name(parameter) {
-    return new Promise((resolve, rejcet) => {
+    return new Promise((resolve, reject) => {
         const queryData = `SELECT nickname FROM user where user_key = ?`;
         db.query(queryData, [parameter], (err, db_data) => {
             if(db_data) resolve(db_data);
