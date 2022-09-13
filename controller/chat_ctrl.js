@@ -5,25 +5,10 @@ const chatDAO = require("../model/chatDAO");
 async function chat_list_read(req, res, next) {
     try {
         const user_key = (req.get('user_key') != "" && req.get('user_key') != undefined) ? req.get('user_key') : null;
-        let chat_infos = await chatDAO.chat_listR(user_key);
-
-        let post_user_infos = [];
-
-        for(let i=0; i<chat_infos.length; i++) {
-            let parameter = chat_infos[i].user_key;
-            let post_user_info = await chatDAO.post_user_info(parameter);
-
-            if(post_user_info.user_key == user_key) {
-                let my_profile = await chatDAO.my_profile_info(user_key)
-                post_user_infos.push(my_profile[0])
-            } else {
-                post_user_infos.push(post_user_info[0])
-            }
-        }
+        const db_data = await chatDAO.chat_listR(user_key);
 
         res.json({
-            "chat_info": chat_infos,
-            "post_user_info": post_user_infos
+            "db_data": db_data
         });
     } catch (err) {
         console.log(err)

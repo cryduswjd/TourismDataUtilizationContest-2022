@@ -288,6 +288,7 @@ async function companionPost_read(req, res, next) {
             "post_key": post_key
         });
     } catch (err) {
+        console.log(err)
         res.send("읽어올 수 없습니다.");
     }
 }

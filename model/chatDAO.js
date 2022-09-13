@@ -5,7 +5,10 @@ const {db} = require("../config/dbconn");
 //채팅방 리스트
 function chat_listR(parameter) {
     return new Promise((resolve, reject) => {
-        const queryData =  `SELECT room_key, accompany.user_key, chat_list.title, chat_list.post_key, chat_list.type FROM chat_list
+        const queryData =  `SELECT room_key, accompany.user_key, chat_list.title, chat_list.post_key, chat_list.type,
+                            (SELECT user.nickname from chat_list left join user on accompany.user_key = user.user_key order by personnel DESC limit 1 ) AS nickname,
+                            (SELECT user.img from chat_list left join user on accompany.user_key = user.user_key order by personnel DESC limit 1 ) AS img
+                            FROM chat_list
                             LEFT OUTER JOIN accompany on chat_list.post_key = accompany.post_key
                             where chat_list.user_key = ?
                             ORDER BY room_key DESC`;
@@ -14,26 +17,6 @@ function chat_listR(parameter) {
             else reject(err);
         })
     });
-}
-
-function post_user_info(parameter) {
-    return new Promise((resolve, reject) => {
-        const queryData = `SELECT nickname, img FROM user where user_key = ?`;
-        db.query(queryData, [parameter], (err, db_data) => {
-            if(db_data) resolve(db_data);
-            else reject(err);
-        })
-    })
-}
-
-function my_profile_info(parameter) {
-    return new Promise((resolve, reject) => {
-        const queryData = `SELECT nickname, img FROM user where user_key = ?`;
-        db.query(queryData, [parameter], (err, db_data) => {
-            if(db_data) resolve(db_data);
-            else reject(err);
-        })
-    })
 }
 
 //채팅방
@@ -302,7 +285,6 @@ function participant_list(parameter) {
 module.exports = {  
     chat_listR,
     chat_read_each,
-    my_profile_info,
     chat_listR_socket,
     chat_list_key,
     plus_personnel,
@@ -325,5 +307,5 @@ module.exports = {
     get_post_user_key,
     check_host,
     already_room,
-    post_user_info
+    participant_list
 }
