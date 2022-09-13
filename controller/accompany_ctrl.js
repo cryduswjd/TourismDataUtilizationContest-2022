@@ -278,11 +278,13 @@ async function companionPost_read(req, res, next) {
     try {
         const post_key = req.params.post_key;
         const user_key = await accompanyDAO.companion_postD_check_identity(post_key);
+        const user_keys = await chatDAO.participant_list(post_key);
         const db_data = await accompanyDAO.companion_postR(post_key);
 
         res.json({
             "db_data": db_data,
             "user_key": user_key,
+            "user_keys": user_keys,
             "post_key": post_key
         });
     } catch (err) {
@@ -358,12 +360,17 @@ async function companionPost_search_user(req, res, next) {
             limit: page.limit
         }
 
-        const db_data = await accompanyDAO.companion_search_user(parameter);
+        if (parameter.search_user == (null || undefined || "")) {
+            res.json({ db_data: [] })
+        } else {
+            const db_data = await accompanyDAO.companion_search_user(parameter);
         
-        res.json({
-            "db_data": db_data
-        });
+            res.json({
+                "db_data": db_data
+            });
+        }
     } catch (err) {
+        console.log(err)
         res.send("사용자를 입력하세요.");
     }
 }
@@ -380,11 +387,15 @@ async function companionPost_search_area(req, res, next) {
             limit: page.limit
         }
 
-        const db_data = await accompanyDAO.companion_search_area(parameter);
+        if (parameter.search_area == (null || undefined || "")) {
+            res.json({ db_data: [] })
+        } else {
+            const db_data = await accompanyDAO.companion_search_area(parameter);
         
-        res.json({
-            "db_data": db_data
-        });
+            res.json({
+                "db_data": db_data
+            });
+        }
     } catch (err) {
         res.send("지역을 입력하세요.");
     }
@@ -518,8 +529,10 @@ async function companionPost_createChat(req, res, next) {
         let already_room = await chatDAO.already_room(parameter);
         already_room = already_room[0].cnt;
 
+        //게시글 user_key
         const check_host = await accompanyDAO.companion_postD_check_identity(post_key);
 
+        //현재 사용자가 짝궁 상태인가, 호스트인가, 채팅방에 참여중인가 확인
         if(check_pair[0].cnt == 0 && user_key != check_host[0].user_key && already_room == 0) {
             
             parameter = { room_key: db_data.room_key, user_key, post_key: db_data.post_key, title: db_data.title };
@@ -529,14 +542,11 @@ async function companionPost_createChat(req, res, next) {
 
             res.json({ 
                 "db_data": db_data,
-                "user_key": user_key,
                 "result": "짝궁 가능"
             });
-        }
-        else {
+        } else {
             res.json({ 
                 "db_data": db_data,
-                "user_key": user_key,
                 "result": "짝궁 불가"
             });
         }

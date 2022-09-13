@@ -10,7 +10,6 @@ module.exports = (server) => {
     io.on('connection', (socket)=>{
         // 방참여 요청
         socket.on('req_join_room', async (msg) => {
-            
             msg = JSON.parse(msg);
 
             console.log('msg: ', msg)
@@ -33,7 +32,6 @@ module.exports = (server) => {
     
         // 채팅방에 채팅 요청
         socket.on('req_room_message', async(msg) => {
-
             msg = JSON.parse(msg);
 
             const parameter = {
@@ -53,7 +51,6 @@ module.exports = (server) => {
     
         //채팅방 나가기 요청
         socket.on('exit_room', async(msg) => {
-
             msg = JSON.parse(msg);
 
             const parameter = {
@@ -72,7 +69,6 @@ module.exports = (server) => {
 
         //채팅방 내보내기 요청
         socket.on('export_room', async(msg) => {
-
             msg = JSON.parse(msg);
             
             const parameter = {

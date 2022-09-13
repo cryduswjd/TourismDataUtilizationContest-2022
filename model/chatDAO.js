@@ -1,19 +1,39 @@
 "use strict";
 
 const {db} = require("../config/dbconn");
+
 //채팅방 리스트
 function chat_listR(parameter) {
     return new Promise((resolve, reject) => {
-        const queryData = `SELECT room_key, chat_list.title, nickname, img FROM chat_list 
-                           LEFT OUTER JOIN user on chat_list.user_key = user.user_key 
-                           LEFT OUTER JOIN accompany on chat_list.post_key = accompany.post_key
-                           where chat_list.user_key = ?
-                           ORDER BY room_key DESC`;
+        const queryData =  `SELECT room_key, accompany.user_key, chat_list.title, chat_list.post_key, chat_list.type FROM chat_list
+                            LEFT OUTER JOIN accompany on chat_list.post_key = accompany.post_key
+                            where chat_list.user_key = ?
+                            ORDER BY room_key DESC`;
         db.query(queryData, [parameter], (err, db_data) => {
             if(db_data) resolve(db_data);
             else reject(err);
         })
     });
+}
+
+function post_user_info(parameter) {
+    return new Promise((resolve, reject) => {
+        const queryData = `SELECT nickname, img FROM user where user_key = ?`;
+        db.query(queryData, [parameter], (err, db_data) => {
+            if(db_data) resolve(db_data);
+            else reject(err);
+        })
+    })
+}
+
+function my_profile_info(parameter) {
+    return new Promise((resolve, reject) => {
+        const queryData = `SELECT nickname, img FROM user where user_key = ?`;
+        db.query(queryData, [parameter], (err, db_data) => {
+            if(db_data) resolve(db_data);
+            else reject(err);
+        })
+    })
 }
 
 //채팅방
@@ -119,7 +139,7 @@ function chat_companion(parameter) {
 
 function chat_companion_R(parameter) {
     return new Promise((resolve, reject) => {
-        const queryData = `SELECT chat_key, user_key, msg, date, nickname, img FROM chating LEFT OUTER JOIN user ON chating.user_key = user.user_key where chat_key = ?`;
+        const queryData = `SELECT chat_key, chating.user_key as user_key, msg, date_format(date, '%Y-%m-%d %T') as date, nickname, img FROM chating LEFT OUTER JOIN user ON chating.user_key = user.user_key where chat_key = ?`;
         db.query(queryData, [parameter], (err, db_data) => {
             if(db_data) resolve(db_data);
             else reject(err);
@@ -269,9 +289,20 @@ function already_room(parameter) {
     })
 }
 
+function participant_list(parameter) {
+    return new Promise((resolve, reject) => {
+        const queryData = `SELECT user_key FROM chat_list where post_key = ?`;
+        db.query(queryData, [parameter], (err, db_data) => {
+            if(db_data) resolve(db_data);
+            else reject(err);
+        })
+    })
+}
+
 module.exports = {  
     chat_listR,
     chat_read_each,
+    my_profile_info,
     chat_listR_socket,
     chat_list_key,
     plus_personnel,
@@ -293,5 +324,6 @@ module.exports = {
     get_post_key,
     get_post_user_key,
     check_host,
-    already_room
+    already_room,
+    post_user_info
 }
