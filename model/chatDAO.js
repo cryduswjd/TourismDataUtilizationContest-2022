@@ -259,6 +259,16 @@ function check_host(parameter) {
 }
 /////////// host만 가능하게 서버가 코드를 짤 경우 ////////////
 
+function already_room(parameter) {
+    return new Promise((resolve, reject) => {
+        const queryData = `SELECT count(room_key) as cnt FROM chat_list where user_key = ? AND post_key = ?`;
+        db.query(queryData, [parameter.user_key, parameter.post_key], (err, db_data) => {
+            if(db_data) resolve(db_data);
+            else reject(err);
+        })
+    })
+}
+
 module.exports = {  
     chat_listR,
     chat_read_each,
@@ -282,5 +292,6 @@ module.exports = {
     chat_list_room_key,
     get_post_key,
     get_post_user_key,
-    check_host
+    check_host,
+    already_room
 }
