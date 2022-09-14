@@ -5,6 +5,9 @@ const router = express.Router();
 const pair_ctrl = require("../controller/pair_ctrl");
 const multer = require("../middleware/multer");
 
+//짝궁 리스트 보여주기
+router.get('/pair_list', pair_ctrl.pair_list);
+
 //큐알 값(user_id) 보내주기 - 사용자버전
 router.get('/qr_info', pair_ctrl.qr_info);
 //큐알 체크 - 호스트버전

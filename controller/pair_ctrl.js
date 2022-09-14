@@ -4,6 +4,29 @@ const pairDAO = require("../model/pairDAO");
 const decoDAO = require("../model/decoDAO");
 const alarmDAO = require("../model/alarmDAO");
 
+//짝궁 리스트 보여주기
+async function pair_list(req, res, next) {
+    try {
+        const user_key = (req.get('user_key') != "" && req.get('user_key') != undefined) ? req.get('user_key') : null;
+
+        //user_key의 post_key select
+        let get_post_key = await pairDAO.get_post_key(user_key);
+        get_post_key = get_post_key[0].post_key;
+
+        //post_key의 작성자 select
+        let post_user_key = await pairDAO.post_user_key(get_post_key);
+
+        let db_data = await pairDAO.pair_list_user(get_post_key);
+
+        res.json({
+            "db_data": db_data
+        })
+    } catch (err) {
+        console.log(err)
+        res.send("짝궁 리스트 오류");
+    }
+}
+
 //큐알에 쓰이는 정보 보내주기 - 사용자버전
 async function qr_info(req, res, next) {
     try {
@@ -313,6 +336,7 @@ async function disconnect_pair(req, res, next) {
 }
 
 module.exports = {
+    pair_list,
     qr_info,
     qr_check,
     user_disable,

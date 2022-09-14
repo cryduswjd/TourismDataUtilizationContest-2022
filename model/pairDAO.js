@@ -2,6 +2,38 @@
 
 const {db} = require("../config/dbconn");
 
+function get_post_key(parameter) {
+    return new Promise((resolve, reject) => {
+        const queryData = `SELECT post_key FROM pair_list where user_key = ? AND trip_end = 0`;
+        db.query(queryData, [parameter], (err, db_data) => {
+            if(db_data) resolve(db_data);
+            else reject(err);
+        })
+    })
+}
+
+function post_user_key(parameter) {
+    return new Promise((resolve, reject) => {
+        const queryData = `SELECT user_key FROM accompany where post_key = ?`;
+        db.query(queryData, [parameter], (err, db_data) => {
+            if(db_data) resolve(db_data);
+            else reject(err);
+        })
+    })
+}
+
+function pair_list_user(parameter) {
+    return new Promise((resolve, reject) => {
+        const queryData = `SELECT nickname, img, (SELECT personnel FROM chat_list 
+                           WHERE chat_list.user_key=user.user_key AND chat_list.post_key=pair_list.post_key) AS personnel FROM pair_list 
+                           LEFT OUTER JOIN user ON pair_list.user_key = user.user_key where post_key = 293 AND trip_end = 0 ORDER BY personnel DESC`;
+        db.query(queryData, [parameter], (err, db_data) => {
+            if(db_data) resolve(db_data);
+            else reject(err);
+        })
+    })
+}
+
 function load_user_key(parameter) {
     return new Promise((resolve, reject) => {
         const queryData = `SELECT user_key FROM chat_list where post_key = ?`;
@@ -287,6 +319,9 @@ function count_share(parameter) {
 }
 
 module.exports = {
+    get_post_key,
+    post_user_key,
+    pair_list_user,
     load_user_key,
     load_user_id,
     insert_pair,

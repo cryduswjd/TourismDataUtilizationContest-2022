@@ -430,15 +430,13 @@ async function companionPost_Deadline_Btn(req, res, next) {
         const mate_user = await pairDAO.get_mate_user(post_key);
 
         let send_deco = []; let deco_data = [];
-        let alarm_data = []; let user_keys = [];
-        let alarm_key;
+        let alarm_data = []; let alarm_key;
         
         for(let i=0; i<mate_user.length; i++) {
             let count_user = await pairDAO.count_user(mate_user[i].user_key);
-            let user_key = mate_user[i].user_key;;
+            let user_key = mate_user[i].user_key;
 
             if(count_user[0].cnt == 1) {
-                user_keys.push(user_key)
                 let str = await decoDAO.send_deco(10);
                 send_deco.push(str);
                 str = str[0].content;
@@ -460,7 +458,6 @@ async function companionPost_Deadline_Btn(req, res, next) {
             }
 
             else if(count_user[0].cnt == 5) {
-                user_keys.push(user_key)
                 let str = await decoDAO.send_deco(11);
                 send_deco.push(str);
                 str = str[0].content;
@@ -482,7 +479,6 @@ async function companionPost_Deadline_Btn(req, res, next) {
             }
 
             else if(count_user[0].cnt == 10) {
-                user_keys.push(user_key)
                 let str = await decoDAO.send_deco(12);
                 send_deco.push(str);
                 str = str[0].content;
