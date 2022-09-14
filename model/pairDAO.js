@@ -26,7 +26,7 @@ function pair_list_user(parameter) {
     return new Promise((resolve, reject) => {
         const queryData = `SELECT nickname, img, (SELECT personnel FROM chat_list 
                            WHERE chat_list.user_key=user.user_key AND chat_list.post_key=pair_list.post_key) AS personnel FROM pair_list 
-                           LEFT OUTER JOIN user ON pair_list.user_key = user.user_key where post_key = 293 AND trip_end = 0 ORDER BY personnel DESC`;
+                           LEFT OUTER JOIN user ON pair_list.user_key = user.user_key where post_key = ? AND trip_end = 0 ORDER BY personnel DESC`;
         db.query(queryData, [parameter], (err, db_data) => {
             if(db_data) resolve(db_data);
             else reject(err);
